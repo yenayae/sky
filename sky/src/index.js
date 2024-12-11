@@ -7,19 +7,106 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import Community from "./Pages/Community";
 import Home from "./Pages/Home";
+import PostDetails from "./Pages/PostDetails";
+import Cosmetics from "./Pages/Cosmetics";
+import CosmeticDetails from "./Pages/CosmeticDetails";
+import ContactPage from "./Pages/ContactPage";
+import SubmissionPage from "./Pages/SubmissionPage";
+import CreatePost from "./Pages/CreatePost";
+import EditPost from "./Pages/EditPost";
+import LikedPosts from "./Pages/LikedPosts";
+
+const SERVER = "http://localhost:3000";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
   },
+
+  {
+    path: "/app",
+    element: <App />,
+  },
+
+  {
+    path: "/contact",
+    element: <ContactPage />,
+  },
+
+  {
+    path: "/success",
+    element: <SubmissionPage />,
+  },
+
+  {
+    path: "/createPost",
+    element: <CreatePost />,
+  },
+
+  {
+    path: "/editPost/:id",
+    element: <EditPost />,
+    loader({ params }) {
+      return fetch(`${SERVER}/posts/${params.id}`).then((response) => {
+        return response.json();
+      });
+    },
+  },
+
+  {
+    path: "/likedPosts/:id",
+    element: <LikedPosts />,
+    loader({ params }) {
+      return fetch(`${SERVER}/likedPosts?user_id=${params.id}`).then(
+        (response) => {
+          return response.json();
+        }
+      );
+    },
+  },
+
+  {
+    path: "/cosmetics",
+    element: <Cosmetics />,
+    loader() {
+      return fetch(SERVER + "/cosmetics").then((response) => {
+        return response.json();
+      });
+    },
+  },
+  {
+    path: "/cosmetics/:id",
+    element: <CosmeticDetails />,
+    loader({ params }) {
+      return fetch(`${SERVER}/cosmetics/${params.id}`).then((response) => {
+        if (!response.ok) {
+          throw new Response("Cosmetic not found", { status: 404 });
+        }
+        return response.json();
+      });
+    },
+  },
   {
     path: "/blog",
     element: <Community />,
     loader() {
-      return fetch("db.json")
-        .then((response) => response.json())
-        .then((data) => data.posts);
+      return fetch(SERVER + "/posts").then((response) => {
+        return response.json();
+      });
+    },
+  },
+
+  {
+    path: "/blog/:id",
+    element: <PostDetails />,
+    loader({ params }) {
+      return fetch(`${SERVER}/posts/${params.id}`).then((response) => {
+        if (!response.ok) {
+          throw new Response("Post not found", { status: 404 });
+        }
+        return response.json();
+      });
     },
   },
 ]);

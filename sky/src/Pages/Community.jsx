@@ -4,9 +4,9 @@ import NavBar from "../Components/NavBar";
 import styled from "styled-components";
 import { Link, useLoaderData } from "react-router-dom";
 import React, { useState, useEffect } from "react";
+import "../Styles/styles.css";
 
 const Container = styled.div`
-  // background-color: orange;
   height: 100vh;
   display: flex;
   flex-direction: row;
@@ -15,50 +15,44 @@ const Container = styled.div`
 `;
 
 const Column = styled.div`
-  // background-color: pink;
   height: 100%;
   min-width: 200px;
-  margin: 10px;
-`;
-
-const Header = styled.div`
-  background-color: blue;
-  display: flex;
-  align-items: center;
+  margin: 5px;
 `;
 
 const Community = () => {
-  const posts = useLoaderData();
-  const RESIZE_TIMEOUT = 200;
-  const COLUMN_DIVISION = 215;
+  useState(() => {
+    document.title = "Community Blog";
+  }, []);
 
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  // Constants for resize function
+  const RESIZE_TIMEOUT = 200;
+  const COLUMN_DIVISION = 220;
+
+  // Get posts from API
+  const posts = useLoaderData();
+
+  // Store number of columns based on window size
   const [columns, setColumns] = useState([]);
 
-  /* 
-  window resize function:
-  once the user doesn't resize window for RESIZE_TIMEOUT ms,
-  calcuale columnNum by windowsize/COLUMN_DIVISION
-  redo layout with columnNum number of columns
-  distribute posts accordingly (use post id as order)
-  */
+  // Search results
+  const [searchResults, setSearchResults] = useState(posts);
+
+  // Helper function to distribute posts into columns
+  const distributePosts = (postList, columnNum) => {
+    const columnsArray = Array.from({ length: columnNum }, () => []);
+    postList.forEach((post, index) => {
+      const columnIndex = index % columnNum;
+      columnsArray[columnIndex].push(post);
+    });
+    setColumns(columnsArray);
+  };
+
+  //For resizing and distributing posts
   useEffect(() => {
     let resizeTimeout;
 
-    const distributePosts = (columnNum) => {
-      // initialize empty arrays for each column
-      const columnsArray = Array.from({ length: columnNum }, () => []);
-
-      posts.forEach((post, index) => {
-        // distribute posts based on their index
-        const columnIndex = index % columnNum;
-        columnsArray[columnIndex].push(post);
-      });
-      setColumns(columnsArray);
-    };
-
     const handleResize = () => {
-      setScreenWidth(window.innerWidth);
       clearTimeout(resizeTimeout);
 
       resizeTimeout = setTimeout(() => {
@@ -66,28 +60,36 @@ const Community = () => {
           1,
           Math.floor(window.innerWidth / COLUMN_DIVISION)
         );
-        distributePosts(columnNum);
+        distributePosts(searchResults, columnNum);
       }, RESIZE_TIMEOUT);
     };
 
     window.addEventListener("resize", handleResize);
 
-    // initial column distribution
+    // Initial column distribution
     const initialColumnNum = Math.max(
       1,
       Math.floor(window.innerWidth / COLUMN_DIVISION)
     );
-    distributePosts(initialColumnNum);
+    distributePosts(searchResults, initialColumnNum);
 
     return () => {
       clearTimeout(resizeTimeout);
       window.removeEventListener("resize", handleResize);
     };
-  }, [posts]);
+  }, [searchResults]);
+
+  // Search by input
+  const handleSearch = (query) => {
+    const filtered = posts.filter((post) =>
+      post.title.replace(/_/g, " ").toLowerCase().includes(query.toLowerCase())
+    );
+    setSearchResults(filtered);
+  };
 
   return (
     <div>
-      <NavBar></NavBar>
+      <NavBar page={"communityPage"} onSearch={handleSearch}></NavBar>
       <Container>
         {columns.map((columnPosts, colIndex) => (
           <Column key={colIndex}>

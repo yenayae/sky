@@ -1,0 +1,13 @@
+.user-post {
+  position: relative;
+}
+
+.hover-heart {
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.user-post:hover .hover-heart {
+  opacity: 1;
+}

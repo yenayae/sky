@@ -1,0 +1,40 @@
+.post {
+  padding: 5px;
+  transition: background-color 0.2s ease;
+}
+
+.post:hover {
+  background-color: #eeebeb;
+}
+
+.post-heart {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.nav-button {
+  background-color: #e6e4e5;
+  border: none;
+  border-radius: 10px;
+  height: 100%;
+  padding: 0 20px;
+  margin: 0 2px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-button:hover {
+  background-color: #b9b2ac;
+  color: white;
+}
+
+.liked-post {
+  cursor: pointer;
+  text-decoration: none;
+  color: black;
+  transition: background-color 0.2s ease;
+}
+
+.liked-post:hover {
+  background-color: #eeebeb;
+}
