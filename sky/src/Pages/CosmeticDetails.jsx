@@ -3,6 +3,7 @@ import NavBar from "../Components/NavBar";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import CosmeticIcon from "../Components/CosmeticIcon";
+import { supabase } from "../supabase/supabaseClient";
 
 const Details = styled.div`
   display: flex;
@@ -65,28 +66,52 @@ function createImageFileLink(url, type_id) {
 const CosmeticDetails = () => {
   const cosmeticInfo = useLoaderData();
   const [cosmeticImages, setCosmeticImages] = useState([]);
+  const [cosmeticTypes, setCosmeticTypes] = useState([]);
 
   const cosmeticName = extractName(cosmeticInfo.name);
   useState(() => {
     document.title = cosmeticName;
   }, []);
 
+  useEffect(() => {
+    const fetchCosmeticTypes = async () => {
+      const { data, error } = await supabase.from("cosmetic_types").select("*");
+      if (error) {
+        console.error("Error fetching cosmetic types:", error);
+      } else {
+        setCosmeticTypes(data);
+      }
+    };
+
+    fetchCosmeticTypes();
+  }, []);
+
   //load in cosmetic details
   useEffect(() => {
-    fetch(`http://localhost:3000/cosmeticImages?cosmetic_id=${cosmeticInfo.id}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch cosmetic images");
+    const fetchCosmeticImages = async () => {
+      try {
+        const { data: cosmetic_images, error } = await supabase
+          .from("cosmetic_images")
+          .select("image_url")
+          .eq("cosmetic_id", cosmeticInfo.id);
+
+        if (error) {
+          throw error;
         }
-        return response.json();
-      })
-      .then((images) => {
-        setCosmeticImages(images);
-      })
-      .catch((error) => {
+
+        setCosmeticImages(cosmetic_images);
+        console.log(cosmetic_images);
+      } catch (error) {
         console.error("Error fetching cosmetic images:", error);
-      });
+      }
+    };
+
+    if (cosmeticInfo?.id) {
+      fetchCosmeticImages();
+    }
   }, [cosmeticInfo.id]);
+
+  console.log(cosmeticInfo);
 
   return (
     <div>
@@ -110,7 +135,12 @@ const CosmeticDetails = () => {
             <DetailsH1>{cosmeticName}</DetailsH1>
           </DetailsTitle>
           <div>
-            <CosmeticIcon cosmetic={cosmeticInfo} />
+            <CosmeticIcon
+              key={cosmeticInfo.id}
+              cosmetic={cosmeticInfo}
+              cosmeticTypes={cosmeticTypes}
+              index={10}
+            ></CosmeticIcon>
             <p>
               Price: {cosmeticInfo.costNum} {cosmeticInfo.costType}
             </p>

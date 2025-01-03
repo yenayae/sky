@@ -36,7 +36,6 @@ const Icon = styled.img`
 export default function CosmeticIcon({ cosmetic, cosmeticTypes, index }) {
   const [cosmeticPath, setCosmeticPath] = useState("");
   const [loading, setLoading] = useState(true);
-  console.log(index);
 
   useEffect(() => {
     const findCosmeticType = () => {
