@@ -20,7 +20,7 @@ const cosmeticsLoader = async () => {
   const { data, error } = await supabase
     .from("cosmetics")
     .select("*")
-    .limit(200);
+    .limit(150);
 
   if (error) {
     throw new Error("Error fetching cosmetics: " + error.message);

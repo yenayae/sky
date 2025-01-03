@@ -41,6 +41,22 @@ const Cosmetics = () => {
   const [loading, setLoading] = useState(false);
   const [allLoaded, setAllLoaded] = useState(false);
   const [page, setPage] = useState(2);
+  const [cosmeticTypes, setCosmeticTypes] = useState([]);
+
+  const LOAD_AMOUNT = 100;
+
+  useEffect(() => {
+    const fetchCosmeticTypes = async () => {
+      const { data, error } = await supabase.from("cosmetic_types").select("*");
+      if (error) {
+        console.error("Error fetching cosmetic types:", error);
+      } else {
+        setCosmeticTypes(data);
+      }
+    };
+
+    fetchCosmeticTypes();
+  }, []);
 
   // Fetch more cosmetics when user scrolls near bottom
   const loadMoreCosmetics = async () => {
@@ -60,11 +76,11 @@ const Cosmetics = () => {
         query = query.eq("type_id", selectedCategory);
       }
 
-      // Fetch the next page of items
+      // Fetch LOAD_AMOUNT items per page
       const { data, error } = await query.range(
-        (page - 1) * 100,
-        page * 100 - 1
-      ); // Fetch 100 items per page
+        (page - 1) * LOAD_AMOUNT,
+        page * LOAD_AMOUNT - 1
+      );
 
       if (error) {
         throw new Error("Error fetching cosmetics: " + error.message);
@@ -101,14 +117,18 @@ const Cosmetics = () => {
   useEffect(() => {
     if (allLoaded) return;
 
+    let lastLoadedTime = Date.now();
+
+    //load more very .1 seconds
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && Date.now() - lastLoadedTime >= 100) {
+          lastLoadedTime = Date.now();
           loadMoreCosmetics();
         }
       },
-      { threshold: 1.0 } // Trigger when the bottom of the page is reached
+      { threshold: 1.0 }
     );
 
     const loadMoreElement = document.getElementById("loadMore");
@@ -195,11 +215,13 @@ const Cosmetics = () => {
             {searchResults.length === 0 ? (
               <span>not added yet!</span>
             ) : (
-              searchResults.map((cosmetic) => {
+              searchResults.map((cosmetic, i) => {
                 return (
                   <CosmeticIcon
                     key={cosmetic.id}
                     cosmetic={cosmetic}
+                    cosmeticTypes={cosmeticTypes}
+                    index={i % LOAD_AMOUNT}
                   ></CosmeticIcon>
                 );
               })

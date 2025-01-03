@@ -1,60 +1,69 @@
 import { Link } from "react-router-dom";
-import styled from "styled-components";
-import { supabase } from "../supabase/supabaseClient";
+import styled, { keyframes } from "styled-components";
 import { useEffect, useState } from "react";
+
+// Keyframes for fade-in animation
+const fadeIn = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateY(10px); /* Slight slide-up effect */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 const Icon = styled.img`
   background-color: ${(props) =>
     props.loading ? "transparent" : "rgba(20, 18, 14, 0.5)"};
-  height: 70px;
-  width: 70px;
+  height: 85px;
+  width: 85px;
   border-radius: 10px;
   cursor: pointer;
   display: flex;
-  transition: background-color 0.3s, opacity 0.5s ease-in;
-  opacity: ${(props) => (props.loading ? 0 : 1)};
+  opacity: 0; /* Start invisible */
+  animation: ${(props) => (props.loading ? "none" : fadeIn)} 0.5s ease-in-out;
+  animation-delay: ${(props) => props.index * 0.01}s; /* Stagger animation */
+  animation-fill-mode: forwards; /* Ensure the final state persists */
+  transition: background-color 0.3s;
+
   &:hover {
     background-color: rgba(20, 18, 14, 0.7);
   }
 `;
 
-export default function CosmeticIcon({ cosmetic }) {
-  const [cosmeticType, setCosmeticType] = useState(null);
-  const [loading, setLoading] = useState(true);
+export default function CosmeticIcon({ cosmetic, cosmeticTypes, index }) {
   const [cosmeticPath, setCosmeticPath] = useState("");
+  const [loading, setLoading] = useState(true);
+  console.log(index);
 
   useEffect(() => {
-    const fetchCosmeticType = async () => {
-      let { data, error } = await supabase
-        .from("cosmetic_types")
-        .select("name")
-        .eq("id", cosmetic.type_id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching cosmetic type:", error);
-      } else {
-        let category = data.name;
-        if (data.name.includes("props")) {
-          category = "props";
-        }
-
-        const path = `/img/cosmetics/${category}_icons/` + cosmetic.icon;
-        setCosmeticPath(path);
-        setCosmeticType(data);
-        setLoading(false);
+    const findCosmeticType = () => {
+      const type = cosmeticTypes.find((type) => type.id === cosmetic.type_id);
+      if (type) {
+        let category = type.name.includes("props") ? "props" : type.name;
+        setCosmeticPath(`/img/cosmetics/${category}_icons/${cosmetic.icon}`);
       }
     };
 
-    fetchCosmeticType();
-  }, [cosmetic.type_id, cosmetic.icon]);
+    if (cosmeticTypes.length > 0) {
+      findCosmeticType();
+    }
+  }, [cosmetic.type_id, cosmetic.icon, cosmeticTypes]);
+
+  const handleImageLoad = () => {
+    setLoading(false);
+  };
 
   return (
     <Link to={`/cosmetics/${cosmetic.id}`}>
       <Icon
-        src={loading ? "" : cosmeticPath}
+        src={cosmeticPath}
         alt={cosmetic.name}
         loading={loading}
+        onLoad={handleImageLoad}
+        index={index}
       />
     </Link>
   );
