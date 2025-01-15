@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Closet from "../Components/Closet";
 import { useLoaderData } from "react-router-dom";
 import CosmeticIcon from "../Components/CosmeticIcon";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../supabase/supabaseClient";
 
 const ClosetContainer = styled.div`
@@ -36,12 +36,14 @@ const Cosmetics = () => {
   const initialCosmetics = useLoaderData();
   const [cosmetics, setCosmetics] = useState(initialCosmetics);
   const [searchResults, setSearchResults] = useState(initialCosmetics);
+  const [searchState, setSearchState] = useState("default");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(false);
   const [allLoaded, setAllLoaded] = useState(false);
   const [page, setPage] = useState(2);
   const [cosmeticTypes, setCosmeticTypes] = useState([]);
+  const [initialLoadCheck, setInitialLoadCheck] = useState(true);
 
   const LOAD_AMOUNT = 100;
 
@@ -59,21 +61,45 @@ const Cosmetics = () => {
   }, []);
 
   // Fetch more cosmetics when user scrolls near bottom
-  const loadMoreCosmetics = async () => {
-    if (loading) return;
+  const loadMoreCosmetics = useCallback(async () => {
+    if (loading) return; //cancel if already loading in a batch
     setLoading(true);
 
+    console.log("loading more stuff");
     try {
-      let query = supabase.from("cosmetics").select("*");
+      let query = supabase.from("cosmetics").select(
+        `
+        *,
+        cosmetic_types(id, parent_type)
+      `
+      );
+
+      console.log(selectedCategory);
+      console.log(searchState);
 
       // Apply search query if one exists
-      if (searchQuery) {
-        query = query.ilike("name", `%${searchQuery.toLowerCase()}%`); // Adjust for Supabase's `ilike` operator
+      if (searchQuery && searchState === "searchbar") {
+        query = query.ilike("name", `%${searchQuery.toLowerCase()}%`);
       }
 
       // Apply category filter if one is selected
-      if (selectedCategory) {
-        query = query.eq("type_id", selectedCategory);
+      if (selectedCategory && searchState === "category") {
+        console.log("selectedCategory", selectedCategory);
+        //convert category to id (potentially replace in the future)
+        const categoryToTypeIds = {
+          outfits: [1, 2],
+          masks: [3, 4, 5],
+          hair: [6, 7, 8],
+          capes: [9],
+          props: [10, 11, 12],
+        };
+        const typeIds = categoryToTypeIds[selectedCategory.toLowerCase()] || [];
+
+        if (typeIds.length > 0) {
+          query = query.in("type_id", typeIds);
+        }
+
+        // query = query.eq("cosmetic_types.parent_type", selectedCategory);
       }
 
       // Fetch LOAD_AMOUNT items per page
@@ -111,24 +137,40 @@ const Cosmetics = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading, searchQuery, searchState, selectedCategory, page]);
 
-  // Detect scroll event to load more cosmetics when near bottom
+  // Detect if there's space at the bottom and load more cosmetics
   useEffect(() => {
     if (allLoaded) return;
 
     let lastLoadedTime = Date.now();
 
-    //load more very .1 seconds
+    // Function to check if loadMore element is visible
+    const checkForMoreSpace = () => {
+      const loadMoreElement = document.getElementById("loadMore");
+      if (!loadMoreElement) return;
+
+      const bounding = loadMoreElement.getBoundingClientRect();
+      const isVisible =
+        bounding.top < window.innerHeight && bounding.bottom >= 0;
+
+      console.log("isVisible", isVisible);
+
+      if (isVisible && Date.now() - lastLoadedTime >= 100) {
+        lastLoadedTime = Date.now();
+        loadMoreCosmetics();
+      }
+    };
+
+    // IntersectionObserver to track visibility of loadMore
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting && Date.now() - lastLoadedTime >= 100) {
-          lastLoadedTime = Date.now();
-          loadMoreCosmetics();
+        if (entry.isIntersecting) {
+          checkForMoreSpace();
         }
       },
-      { threshold: 1.0 }
+      { threshold: 1.0 } // Trigger when loadMore is fully in view
     );
 
     const loadMoreElement = document.getElementById("loadMore");
@@ -136,18 +178,31 @@ const Cosmetics = () => {
       observer.observe(loadMoreElement);
     }
 
+    const loadUntilNotVisible = () => {
+      const interval = setInterval(() => {
+        const isVisible = checkForMoreSpace();
+        if (!isVisible) {
+          clearInterval(interval); // Stop the interval once loadMore is not visible
+        }
+      }, 100); // Check every 100ms
+    };
+
+    // Initial check for visibility in case loadMore is already in view
+    loadUntilNotVisible();
+
+    // Clean up observer when component unmounts or dependencies change
     return () => {
       if (loadMoreElement) {
-        observer.unobserve(loadMoreElement);
+        observer.unobserve(loadMoreElement); // Stop observing loadMore element
       }
     };
-  }, [loading]);
+  }, [allLoaded, loadMoreCosmetics]);
 
   //search by input
   const handleSearch = (query) => {
+    setSearchState("searchbar");
     setSearchQuery(query); // Track the current search query
     setPage(1); // Reset pagination
-    setAllLoaded(false); // Allow more items to be loaded
 
     const filtered = cosmetics.filter((cosmetic) =>
       cosmetic.name
@@ -156,19 +211,36 @@ const Cosmetics = () => {
         .includes(query.toLowerCase())
     );
     setSearchResults(filtered);
+    setAllLoaded(false); // Allow more items to be loaded
   };
 
   // filter results by category
   const handleCategorySelect = (category) => {
+    setSearchState("category");
     setSelectedCategory(category); // Track the selected category
     setPage(1); // Reset pagination
-    setAllLoaded(false); // Allow more items to be loaded
 
     const filtered = cosmetics.filter(
-      (cosmetic) => cosmetic.type_id === category
+      (cosmetic) => cosmetic.cosmetic_types.parent_type === category
     );
     setSearchResults(filtered);
+
+    // Allow more items to be loaded
+    setAllLoaded(false);
   };
+
+  //monitor if category is selected and load more items
+  useEffect(() => {
+    if (searchState === "category" && !allLoaded) {
+      loadMoreCosmetics();
+    }
+  }, [
+    searchState,
+    selectedCategory,
+    searchResults,
+    allLoaded,
+    loadMoreCosmetics,
+  ]);
 
   return (
     <div>
@@ -178,23 +250,23 @@ const Cosmetics = () => {
           <ClosetContainer>
             <Closet
               cosmeticCategory="outfit"
-              onClick={() => handleCategorySelect("1")}
+              onClick={() => handleCategorySelect("outfits")}
             ></Closet>
             <Closet
               cosmeticCategory="masks"
-              onClick={() => handleCategorySelect("2")}
+              onClick={() => handleCategorySelect("masks")}
             ></Closet>
             <Closet
               cosmeticCategory="hair"
-              onClick={() => handleCategorySelect("3")}
+              onClick={() => handleCategorySelect("hair")}
             ></Closet>
             <Closet
               cosmeticCategory="capes"
-              onClick={() => handleCategorySelect("4")}
+              onClick={() => handleCategorySelect("capes")}
             ></Closet>
             <Closet
               cosmeticCategory="props"
-              onClick={() => handleCategorySelect("5")}
+              onClick={() => handleCategorySelect("props")}
             ></Closet>
           </ClosetContainer>
         </ClosetSelectSection>
@@ -233,6 +305,7 @@ const Cosmetics = () => {
               textAlign: "center",
               padding: "20px",
               cursor: loading ? "not-allowed" : "pointer",
+              backgroundColor: "pink",
             }}
           ></div>
         </div>

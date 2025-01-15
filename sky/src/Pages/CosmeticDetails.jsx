@@ -111,8 +111,6 @@ const CosmeticDetails = () => {
     }
   }, [cosmeticInfo.id]);
 
-  console.log(cosmeticInfo);
-
   return (
     <div>
       <NavBar></NavBar>

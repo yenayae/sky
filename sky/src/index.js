@@ -19,7 +19,12 @@ import LikedPosts from "./Pages/LikedPosts";
 const cosmeticsLoader = async () => {
   const { data, error } = await supabase
     .from("cosmetics")
-    .select("*")
+    .select(
+      `
+      *,
+      cosmetic_types(id, parent_type)
+    `
+    )
     .limit(150);
 
   if (error) {
