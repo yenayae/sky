@@ -181,12 +181,12 @@ const Cosmetics = () => {
       const interval = setInterval(() => {
         const isVisible = checkForMoreSpace();
         if (!isVisible) {
-          clearInterval(interval); // Stop the interval once loadMore is not visible
+          clearInterval(interval); // stop the interval once loadMore is not visible
         }
-      }, 500); // Check every 500ms
+      }, 500); // check every 500ms
     };
 
-    // Initial check for visibility in case loadMore is already in view
+    // initial check for visibility in case loadMore is already in view
     loadUntilNotVisible();
 
     // Clean up observer when component unmounts or dependencies change
