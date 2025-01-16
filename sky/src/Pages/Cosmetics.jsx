@@ -43,7 +43,6 @@ const Cosmetics = () => {
   const [allLoaded, setAllLoaded] = useState(false);
   const [page, setPage] = useState(2);
   const [cosmeticTypes, setCosmeticTypes] = useState([]);
-  const [initialLoadCheck, setInitialLoadCheck] = useState(true);
 
   const LOAD_AMOUNT = 100;
 
@@ -184,7 +183,7 @@ const Cosmetics = () => {
         if (!isVisible) {
           clearInterval(interval); // Stop the interval once loadMore is not visible
         }
-      }, 100); // Check every 100ms
+      }, 500); // Check every 500ms
     };
 
     // Initial check for visibility in case loadMore is already in view
@@ -211,11 +210,16 @@ const Cosmetics = () => {
         .includes(query.toLowerCase())
     );
     setSearchResults(filtered);
-    setAllLoaded(false); // Allow more items to be loaded
+
+    // Allow more items to be loaded
+    setAllLoaded(false);
   };
 
   // filter results by category
   const handleCategorySelect = (category) => {
+    //prevent reloading same categories
+    if (searchState === "category" && selectedCategory === category) return;
+
     setSearchState("category");
     setSelectedCategory(category); // Track the selected category
     setPage(1); // Reset pagination
