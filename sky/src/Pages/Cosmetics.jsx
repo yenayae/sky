@@ -5,6 +5,7 @@ import { useLoaderData } from "react-router-dom";
 import CosmeticIcon from "../Components/CosmeticIcon";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../supabase/supabaseClient";
+import Footer from "../Components/Footer";
 
 const ClosetContainer = styled.div`
   background-color: rgba(16, 17, 36, 0.8);
@@ -277,7 +278,7 @@ const Cosmetics = () => {
 
         <div
           style={{
-            height: "50vh",
+            height: "auto",
             padding: "20px 15px",
           }}
         >
@@ -307,12 +308,15 @@ const Cosmetics = () => {
             id="loadMore"
             style={{
               textAlign: "center",
-              padding: "20px",
+              padding: "5px",
               cursor: loading ? "not-allowed" : "pointer",
-              backgroundColor: "pink",
+              // backgroundColor: "pink",
             }}
           ></div>
         </div>
+      </div>
+      <div>
+        {!allLoaded ? <div className="loader">Loading...</div> : <Footer />}
       </div>
     </div>
   );
