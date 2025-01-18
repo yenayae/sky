@@ -221,16 +221,17 @@ const Cosmetics = () => {
     //prevent reloading same categories
     if (searchState === "category" && selectedCategory === category) return;
 
+    //set search state to category and reset page + add permanent glow
     setSearchState("category");
-    setSelectedCategory(category); // Track the selected category
-    setPage(1); // Reset pagination
+    setSelectedCategory(category);
+    setPage(1);
 
     const filtered = cosmetics.filter(
       (cosmetic) => cosmetic.cosmetic_types.parent_type === category
     );
     setSearchResults(filtered);
 
-    // Allow more items to be loaded
+    // allow more items to be loaded
     setAllLoaded(false);
   };
 
@@ -256,22 +257,27 @@ const Cosmetics = () => {
             <Closet
               cosmeticCategory="outfit"
               onClick={() => handleCategorySelect("outfits")}
+              isSelected={selectedCategory === "outfits"}
             ></Closet>
             <Closet
               cosmeticCategory="masks"
               onClick={() => handleCategorySelect("masks")}
+              isSelected={selectedCategory === "masks"}
             ></Closet>
             <Closet
               cosmeticCategory="hair"
               onClick={() => handleCategorySelect("hair")}
+              isSelected={selectedCategory === "hair"}
             ></Closet>
             <Closet
               cosmeticCategory="capes"
               onClick={() => handleCategorySelect("capes")}
+              isSelected={selectedCategory === "capes"}
             ></Closet>
             <Closet
               cosmeticCategory="props"
               onClick={() => handleCategorySelect("props")}
+              isSelected={selectedCategory === "props"}
             ></Closet>
           </ClosetContainer>
         </ClosetSelectSection>

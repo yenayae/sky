@@ -1,3 +1,13 @@
+:root {
+  --glow-color: rgba(236, 213, 152, 0.623);
+  --hover-glow-color: rgba(229, 208, 155, 0.788);
+}
+
+.glow {
+  -webkit-filter: drop-shadow(0 0 5px var(--glow-color));
+  filter: drop-shadow(0 0px 5px var(--glow-color));
+}
+
 .post {
   padding: 5px;
   transition: background-color 0.2s ease;

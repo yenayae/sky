@@ -9,10 +9,10 @@ const FooterContainer = styled.div`
   color: grey;
 `;
 
-const FooterIcon = styled.img`
-  height: 150px;
-  width: auto;
-`;
+// const FooterIcon = styled.img`
+//   height: 150px;
+//   width: auto;
+// `;
 
 const FooterDivider = styled.hr`
   overflow: visible; /* For IE */
@@ -43,8 +43,9 @@ export default function Footer() {
         src="/img/assets/Soulmates_in_Sky_Pins.webp"
         alt="footer icon"
       /> */}
-      {/* <span>&copy; Sky: Children of the Light</span> */}
+
       <FooterDivider />
+      {/* <span>&copy; Sky: Children of the Light</span> */}
     </FooterContainer>
   );
 }
