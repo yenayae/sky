@@ -5,20 +5,31 @@ import styled from "styled-components";
 import COLORS from "../Styles/theme";
 import "../Styles/styles.css";
 
+const SearchForm = styled.form`
+  flex: 1;
+  background-color: ${COLORS.secondary};
+  padding: 0 20px;
+  display: flex;
+  height: 100%;
+  border-radius: 10px;
+`;
 const SearchInput = styled.input`
   background-color: ${COLORS.secondary};
-  // width: 90%;
+  width: 100%;
   height: 100%;
   border: none;
-  border-radius: 20px;
-  margin: 0 2px;
-  padding: 0 10px;
-  flex-grow: 1;
+  padding: 0;
+
+  &:focus {
+    outline: none;
+    border: none;
+  }
 `;
 
 export default function NavBar({ page, onSearch }) {
-  const handleSearchChange = (e) => {
-    const query = e.target.value;
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const query = e.target.elements.searchInput.value.trim();
     onSearch(query);
   };
 
@@ -51,18 +62,24 @@ export default function NavBar({ page, onSearch }) {
             Cosmetics
           </button>
         </Link>
-        <SearchInput
-          onChange={handleSearchChange}
-          type="text"
-          placeholder={
-            page === "communityPage"
-              ? "Search posts..."
-              : page === "cosmeticPage"
-              ? "Search cosmetics..."
-              : "Search..."
-          }
-          data-testid="searchBar"
-        />
+        <SearchForm className="search-form" onSubmit={handleSearch}>
+          <SearchInput
+            className="search-bar"
+            name="searchInput"
+            type="text"
+            placeholder={
+              page === "communityPage"
+                ? "Search posts..."
+                : page === "cosmeticPage"
+                ? "Search cosmetics..."
+                : "Search..."
+            }
+            data-testid="searchBar"
+          />
+          <button type="submit" style={{ display: "none" }}>
+            Submit
+          </button>
+        </SearchForm>
         <Link to="/createPost" style={{ height: "100%" }}>
           <button className="nav-button" data-testid="post-button">
             <FontAwesomeIcon icon={faPlus} />

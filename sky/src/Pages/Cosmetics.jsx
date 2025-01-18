@@ -6,6 +6,7 @@ import CosmeticIcon from "../Components/CosmeticIcon";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../supabase/supabaseClient";
 import Footer from "../Components/Footer";
+import "../Styles/components/loader.css";
 
 const ClosetContainer = styled.div`
   background-color: rgba(16, 17, 36, 0.8);
@@ -79,6 +80,7 @@ const Cosmetics = () => {
 
       // Apply search query if one exists
       if (searchQuery && searchState === "searchbar") {
+        console.log("searchbar query", searchQuery);
         query = query.ilike("name", `%${searchQuery.toLowerCase()}%`);
       }
 
@@ -111,6 +113,8 @@ const Cosmetics = () => {
       if (error) {
         throw new Error("Error fetching cosmetics: " + error.message);
       }
+
+      console.log("data", data);
 
       // Ensure no duplicates are added
       setCosmetics((prevCosmetics) => {
@@ -200,6 +204,7 @@ const Cosmetics = () => {
 
   //search by input
   const handleSearch = (query) => {
+    console.log(query);
     setSearchState("searchbar");
     setSearchQuery(query); // Track the current search query
     setPage(1); // Reset pagination
@@ -316,7 +321,6 @@ const Cosmetics = () => {
               textAlign: "center",
               padding: "5px",
               cursor: loading ? "not-allowed" : "pointer",
-              // backgroundColor: "pink",
             }}
           ></div>
         </div>

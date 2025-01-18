@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 const fadeIn = keyframes`
   0% {
     opacity: 0;
-    transform: translateY(10px); /* Slight slide-up effect */
+    transform: translateY(10px);
   }
   100% {
     opacity: 1;

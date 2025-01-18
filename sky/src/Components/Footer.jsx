@@ -1,5 +1,16 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import "../Styles/temp.css";
+
+const fadeIn = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 const FooterContainer = styled.div`
   display: flex;
@@ -7,6 +18,8 @@ const FooterContainer = styled.div`
   align-items: center;
   justify-content: center;
   color: grey;
+
+  animation: ${fadeIn} 0.5s ease-out;
 `;
 
 // const FooterIcon = styled.img`
