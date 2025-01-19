@@ -45,6 +45,7 @@ const Cosmetics = () => {
   const [allLoaded, setAllLoaded] = useState(false);
   const [page, setPage] = useState(2);
   const [cosmeticTypes, setCosmeticTypes] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
 
   const LOAD_AMOUNT = 100;
 
@@ -78,14 +79,14 @@ const Cosmetics = () => {
       console.log(selectedCategory);
       console.log(searchState);
 
-      // Apply search query if one exists
+      // search bar query
       if (searchQuery && searchState === "searchbar") {
         console.log("searchbar query", searchQuery);
         query = query.ilike("name", `%${searchQuery.toLowerCase()}%`);
       }
 
-      // Apply category filter if one is selected
-      if (selectedCategory && searchState === "category") {
+      // category filter selected
+      else if (selectedCategory && searchState === "category") {
         console.log("selectedCategory", selectedCategory);
         //convert category to id (potentially replace in the future)
         const categoryToTypeIds = {
@@ -104,7 +105,7 @@ const Cosmetics = () => {
         // query = query.eq("cosmetic_types.parent_type", selectedCategory);
       }
 
-      // Fetch LOAD_AMOUNT items per page
+      // fetch LOAD_AMOUNT items per page
       const { data, error } = await query.range(
         (page - 1) * LOAD_AMOUNT,
         page * LOAD_AMOUNT - 1
@@ -231,6 +232,14 @@ const Cosmetics = () => {
     setSelectedCategory(category);
     setPage(1);
 
+    //add the subcategories if present
+    const subcategories = category
+      ? cosmeticTypes.filter((item) => item.parent_type === category)
+      : [];
+    setSubcategories(subcategories);
+    console.log("sub", subcategories);
+
+    //results from currently loaded cosmetics
     const filtered = cosmetics.filter(
       (cosmetic) => cosmetic.cosmetic_types.parent_type === category
     );
@@ -293,6 +302,14 @@ const Cosmetics = () => {
             padding: "20px 15px",
           }}
         >
+          <div>
+            {subcategories.length === 1
+              ? ""
+              : subcategories.map((sub) => (
+                  <button key={sub.id}>{sub.name}</button>
+                ))}
+          </div>
+
           <div
             style={{
               display: "flex",
@@ -301,7 +318,11 @@ const Cosmetics = () => {
             }}
           >
             {searchResults.length === 0 ? (
-              <span>not added yet!</span>
+              !allLoaded ? (
+                ""
+              ) : (
+                <span>No results!</span>
+              )
             ) : (
               searchResults.map((cosmetic, i) => {
                 return (

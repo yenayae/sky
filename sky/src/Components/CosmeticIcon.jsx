@@ -63,6 +63,7 @@ export default function CosmeticIcon({ cosmetic, cosmeticTypes, index }) {
         loading={loading}
         onLoad={handleImageLoad}
         index={index}
+        className="cosmetic-image"
       />
     </Link>
   );
