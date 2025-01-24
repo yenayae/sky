@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import { useEffect, useState } from "react";
+import useFormatName from "../Hooks/formatName";
 
 // Keyframes for fade-in animation
 const fadeIn = keyframes`
@@ -33,9 +34,38 @@ const Icon = styled.img`
   }
 `;
 
+const Tooltip = styled.div`
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -10px); /* Adjust for offset */
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+
+  ${(props) =>
+    props.show &&
+    `
+    opacity: 1;
+    pointer-events: auto;
+  `}
+`;
+
+const Wrapper = styled.div`
+  position: relative; /* Ensure tooltip is positioned relative to this container */
+  display: inline-block;
+`;
+
 export default function CosmeticIcon({ cosmetic, cosmeticTypes, index }) {
   const [cosmeticPath, setCosmeticPath] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
     const findCosmeticType = () => {
@@ -56,15 +86,20 @@ export default function CosmeticIcon({ cosmetic, cosmeticTypes, index }) {
   };
 
   return (
-    <Link to={`/cosmetics/${cosmetic.id}`}>
-      <Icon
-        src={cosmeticPath}
-        alt={cosmetic.name}
-        loading={loading}
-        onLoad={handleImageLoad}
-        index={index}
-        className="cosmetic-image"
-      />
-    </Link>
+    <Wrapper
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      <Link to={`/cosmetics/${cosmetic.id}`}>
+        <Icon
+          src={cosmeticPath}
+          alt={cosmetic.name}
+          loading={loading}
+          onLoad={handleImageLoad}
+          index={index}
+        />
+      </Link>
+      <Tooltip show={showTooltip}>{useFormatName(cosmetic.name)}</Tooltip>
+    </Wrapper>
   );
 }

@@ -6,6 +6,7 @@ import CosmeticIcon from "../Components/CosmeticIcon";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../supabase/supabaseClient";
 import Footer from "../Components/Footer";
+import SubCategoryButton from "../Components/SubCategoryButton";
 import "../Styles/components/loader.css";
 
 const ClosetContainer = styled.div`
@@ -62,8 +63,9 @@ const Cosmetics = () => {
     fetchCosmeticTypes();
   }, []);
 
-  // Fetch more cosmetics when user scrolls near bottom
+  // fetch more cosmetics when user scrolls near bottom
   const loadMoreCosmetics = useCallback(async () => {
+    if (allLoaded) return; //cancel if all items are loaded
     if (loading) return; //cancel if already loading in a batch
     setLoading(true);
 
@@ -101,8 +103,22 @@ const Cosmetics = () => {
         if (typeIds.length > 0) {
           query = query.in("type_id", typeIds);
         }
+      }
 
-        // query = query.eq("cosmetic_types.parent_type", selectedCategory);
+      // subcategory filter selected
+      else if (selectedCategory && searchState === "subCategory") {
+        console.log("subCategory", selectedCategory);
+        // find the subcategory object from cosmeticTypes
+        const subCategory = cosmeticTypes.find(
+          (type) => type.name.toLowerCase() === selectedCategory.toLowerCase()
+        );
+
+        if (subCategory) {
+          // filter by the subcategory's ID
+          query = query.eq("type_id", subCategory.id);
+        } else {
+          console.error("Subcategory not found for:", selectedCategory);
+        }
       }
 
       // fetch LOAD_AMOUNT items per page
@@ -115,9 +131,7 @@ const Cosmetics = () => {
         throw new Error("Error fetching cosmetics: " + error.message);
       }
 
-      console.log("data", data);
-
-      // Ensure no duplicates are added
+      // ensure no duplicates are added
       setCosmetics((prevCosmetics) => {
         const newCosmetics = data.filter(
           (item) => !prevCosmetics.some((prevItem) => prevItem.id === item.id)
@@ -142,15 +156,23 @@ const Cosmetics = () => {
     } finally {
       setLoading(false);
     }
-  }, [loading, searchQuery, searchState, selectedCategory, page]);
+  }, [
+    loading,
+    searchQuery,
+    searchState,
+    selectedCategory,
+    page,
+    cosmeticTypes,
+    allLoaded,
+  ]);
 
-  // Detect if there's space at the bottom and load more cosmetics
+  // detect if there's space at the bottom and load more cosmetics
   useEffect(() => {
     if (allLoaded) return;
 
     let lastLoadedTime = Date.now();
 
-    // Function to check if loadMore element is visible
+    // check if loadMore element is visible
     const checkForMoreSpace = () => {
       const loadMoreElement = document.getElementById("loadMore");
       if (!loadMoreElement) return;
@@ -195,10 +217,10 @@ const Cosmetics = () => {
     // initial check for visibility in case loadMore is already in view
     loadUntilNotVisible();
 
-    // Clean up observer when component unmounts or dependencies change
+    // clean up observer when component unmounts or dependencies change
     return () => {
       if (loadMoreElement) {
-        observer.unobserve(loadMoreElement); // Stop observing loadMore element
+        observer.unobserve(loadMoreElement);
       }
     };
   }, [allLoaded, loadMoreCosmetics]);
@@ -206,9 +228,10 @@ const Cosmetics = () => {
   //search by input
   const handleSearch = (query) => {
     console.log(query);
+    setSubcategories([]);
     setSearchState("searchbar");
-    setSearchQuery(query); // Track the current search query
-    setPage(1); // Reset pagination
+    setSearchQuery(query);
+    setPage(1);
 
     const filtered = cosmetics.filter((cosmetic) =>
       cosmetic.name
@@ -262,6 +285,35 @@ const Cosmetics = () => {
     loadMoreCosmetics,
   ]);
 
+  // filter results by subcategory
+  const handleSubCategorySelect = (subCategoryName) => {
+    console.log("click");
+    console.log("Selected subcategory:", subCategoryName);
+    setSearchState("subCategory");
+    setSelectedCategory(subCategoryName);
+    setPage(1);
+
+    // find the corresponding subcategory object from cosmeticTypes
+    const subCategory = cosmeticTypes.find(
+      (type) => type.name === subCategoryName
+    );
+
+    if (!subCategory) {
+      console.error("Subcategory not found");
+      setSearchResults([]);
+      return;
+    }
+
+    // filter cosmetics by the subcategory's id
+    const filtered = cosmetics.filter(
+      (cosmetic) => cosmetic.type_id === subCategory.id
+    );
+    setSearchResults(filtered);
+
+    // allow more items to be loaded
+    setAllLoaded(false);
+  };
+
   return (
     <div>
       <NavBar page="cosmeticPage" onSearch={handleSearch} />
@@ -300,13 +352,25 @@ const Cosmetics = () => {
           style={{
             height: "auto",
             padding: "20px 15px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <div>
-            {subcategories.length === 1
+          <div
+            style={{
+              display: "flex",
+            }}
+          >
+            {subcategories.length <= 1
               ? ""
               : subcategories.map((sub) => (
-                  <button key={sub.id}>{sub.name}</button>
+                  <SubCategoryButton
+                    key={sub.id}
+                    categoryName={sub.name}
+                    onClick={() => handleSubCategorySelect(sub.name)}
+                  ></SubCategoryButton>
                 ))}
           </div>
 
@@ -315,6 +379,7 @@ const Cosmetics = () => {
               display: "flex",
               flexWrap: "wrap",
               justifyContent: "center",
+              width: "80%", //keep this below 80% or a horizontal scrollbar will appear
             }}
           >
             {searchResults.length === 0 ? (
