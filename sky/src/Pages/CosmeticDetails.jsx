@@ -51,22 +51,12 @@ function extractName(name) {
     .join(" ");
 }
 
-function createImageFileLink(url, type_id) {
-  let type;
-  if (type_id === "1") {
-    type = "outfit";
-  }
-  if (type_id === "2") {
-    type = "masks";
-  }
-
-  return `/img/cosmetics/${type}_view/${url}`;
-}
-
 const CosmeticDetails = () => {
   const cosmeticInfo = useLoaderData();
   const [cosmeticImages, setCosmeticImages] = useState([]);
   const [cosmeticTypes, setCosmeticTypes] = useState([]);
+
+  console.log(cosmeticInfo);
 
   const cosmeticName = extractName(cosmeticInfo.name);
   useState(() => {
@@ -92,7 +82,7 @@ const CosmeticDetails = () => {
       try {
         const { data: cosmetic_images, error } = await supabase
           .from("cosmetic_images")
-          .select("image_url")
+          .select("id, image_url, alt_caption")
           .eq("cosmetic_id", cosmeticInfo.id);
 
         if (error) {
@@ -117,15 +107,25 @@ const CosmeticDetails = () => {
       <Details>
         <ImageBox>
           {cosmeticImages.length > 0 ? (
-            cosmeticImages.map((image) => (
-              <DetailsImage
-                key={image.id}
-                src={createImageFileLink(image.url, cosmeticInfo.type_id)}
-                alt={image.caption || "Image"}
-              />
-            ))
+            cosmeticImages.map((image) => {
+              // find the cosmetic type name based on the cosmeticInfo.type_id
+              const type = cosmeticTypes.find(
+                (type) => type.id === cosmeticInfo.type_id
+              );
+              const imageSrc = type
+                ? `/img/cosmetics/${type.name}_view/${image.image_url}`
+                : image.image_url;
+
+              return (
+                <DetailsImage
+                  key={image.id}
+                  src={imageSrc}
+                  alt={image.alt_caption || "Add Image Caption!"}
+                />
+              );
+            })
           ) : (
-            <p>No image provided</p>
+            <p>No images available</p>
           )}
         </ImageBox>
         <DetailsBox>

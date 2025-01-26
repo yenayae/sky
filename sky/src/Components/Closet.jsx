@@ -5,7 +5,7 @@ import "../Styles/components/closet.css";
 // adjust color in styles.css
 
 export default function Closet({ cosmeticCategory, onClick, isSelected }) {
-  const imageLink = `/img/closet_icons/${cosmeticCategory}.webp`;
+  const imageLink = `/img/closet_icons/${cosmeticCategory}.png`;
 
   return (
     <div className="portal" onClick={onClick}>

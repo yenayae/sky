@@ -1,6 +1,29 @@
 .subButton {
-  background-color: pink;
+  /* background-color: pink; */
   cursor: pointer;
-  height: 50px;
-  margin: 10px 0;
+  height: auto;
+  width: 150px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-bottom: 5px solid rgba(20, 18, 14, 0);
+  background: none;
+  transition: background-color 0.3s;
+  /* border-radius: 5px; */
+  /* background-image: url("img/closet_icons/hair_icon.webp"); */
+}
+
+.subButtonImg {
+  height: 45px;
+}
+
+.subButton:hover {
+  background-color: rgba(20, 18, 14, 0.5);
+  color: white;
+}
+
+.subButton.selected {
+  border-bottom: 5px solid rgb(212, 191, 133);
 }

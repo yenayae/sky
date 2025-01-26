@@ -38,7 +38,7 @@ const Tooltip = styled.div`
   position: absolute;
   bottom: 100%;
   left: 50%;
-  transform: translate(-50%, -10px); /* Adjust for offset */
+  transform: translate(-50%); /* Adjust for offset */
   background-color: rgba(0, 0, 0, 0.9);
   color: white;
   padding: 5px 10px;
