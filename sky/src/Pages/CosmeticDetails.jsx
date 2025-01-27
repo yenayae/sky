@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import CosmeticIcon from "../Components/CosmeticIcon";
 import { supabase } from "../supabase/supabaseClient";
+import { ImageCarousel } from "../Components/ImageCarousel";
 
 const Details = styled.div`
   display: flex;
@@ -55,6 +56,7 @@ const CosmeticDetails = () => {
   const cosmeticInfo = useLoaderData();
   const [cosmeticImages, setCosmeticImages] = useState([]);
   const [cosmeticTypes, setCosmeticTypes] = useState([]);
+  const [cosmeticType, setCosmeticType] = useState(null);
 
   console.log(cosmeticInfo);
 
@@ -79,6 +81,8 @@ const CosmeticDetails = () => {
   //load in cosmetic details
   useEffect(() => {
     const fetchCosmeticImages = async () => {
+      if (!cosmeticTypes.length) return; // Ensure cosmeticTypes is loaded
+
       try {
         const { data: cosmetic_images, error } = await supabase
           .from("cosmetic_images")
@@ -90,7 +94,15 @@ const CosmeticDetails = () => {
         }
 
         setCosmeticImages(cosmetic_images);
-        console.log(cosmetic_images);
+        let type = cosmeticTypes.find(
+          (type) => type.id === cosmeticInfo.type_id
+        ).name;
+        if (type.includes("props")) {
+          type = "props";
+        }
+
+        setCosmeticType(type);
+        console.log("cosmetic type", type);
       } catch (error) {
         console.error("Error fetching cosmetic images:", error);
       }
@@ -99,35 +111,16 @@ const CosmeticDetails = () => {
     if (cosmeticInfo?.id) {
       fetchCosmeticImages();
     }
-  }, [cosmeticInfo.id]);
+  }, [cosmeticInfo.id, cosmeticTypes]);
 
   return (
     <div>
       <NavBar></NavBar>
       <Details>
-        <ImageBox>
-          {cosmeticImages.length > 0 ? (
-            cosmeticImages.map((image) => {
-              // find the cosmetic type name based on the cosmeticInfo.type_id
-              const type = cosmeticTypes.find(
-                (type) => type.id === cosmeticInfo.type_id
-              );
-              const imageSrc = type
-                ? `/img/cosmetics/${type.name}_view/${image.image_url}`
-                : image.image_url;
-
-              return (
-                <DetailsImage
-                  key={image.id}
-                  src={imageSrc}
-                  alt={image.alt_caption || "Add Image Caption!"}
-                />
-              );
-            })
-          ) : (
-            <p>No images available</p>
-          )}
-        </ImageBox>
+        <ImageCarousel
+          items={cosmeticImages}
+          cosmeticType={cosmeticType}
+        ></ImageCarousel>
         <DetailsBox>
           <DetailsTitle>
             <DetailsH1>{cosmeticName}</DetailsH1>

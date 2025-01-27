@@ -1,5 +1,5 @@
 import NavBar from "../Components/NavBar";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import Closet from "../Components/Closet";
 import { useLoaderData } from "react-router-dom";
 import CosmeticIcon from "../Components/CosmeticIcon";
@@ -8,17 +8,6 @@ import { supabase } from "../supabase/supabaseClient";
 import Footer from "../Components/Footer";
 import SubCategoryButton from "../Components/SubCategoryButton";
 import "../Styles/components/loader.css";
-
-const fadeIn = keyframes`
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
 
 const ClosetContainer = styled.div`
   background-color: rgba(16, 17, 36, 0.8);

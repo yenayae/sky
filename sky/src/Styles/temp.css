@@ -1,29 +1,78 @@
-.subButton {
+.carousel {
   /* background-color: pink; */
-  cursor: pointer;
-  height: auto;
-  width: 150px;
-  margin: 0;
+  overflow: hidden;
+  width: 400px;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid #dadada;
+  border-radius: 20px;
+}
+
+.inner {
+  white-space: nowrap;
+  transition: transform 0.3s;
+  /* box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); */
+}
+
+.carousel-item {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  border-bottom: 5px solid rgba(20, 18, 14, 0);
+  height: auto;
+
+  /* background-color: blue; */
+}
+
+.carousel-img {
+  /* background-color: aqua; */
+  width: 200px;
+  /* height: auto; */
+  padding: 20px 20px 0 20px;
+}
+
+.carousel-buttons {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.button-arrow {
   background: none;
-  transition: background-color 0.3s;
-  /* border-radius: 5px; */
-  /* background-image: url("img/closet_icons/hair_icon.webp"); */
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
 }
 
-.subButtonImg {
-  height: 45px;
+.indicators {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 25px;
 }
 
-.subButton:hover {
-  background-color: rgba(20, 18, 14, 0.5);
-  color: white;
+.indicator-buttons {
+  border: none;
+  cursor: pointer;
 }
 
-.subButton.selected {
-  border-bottom: 5px solid rgb(212, 191, 133);
+.indicators > button {
+  margin: 5px;
+  background: none;
+}
+
+.indicator-symbol {
+  color: grey;
+  transition: color 0.2s ease;
+}
+
+.indicator-symbol-active {
+  color: #26343f;
+}
+
+.no-images-carousel {
+  /* background-color: pink; */
+  height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
