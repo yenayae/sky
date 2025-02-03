@@ -4,10 +4,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
-  faCircleDot,
 } from "@fortawesome/free-solid-svg-icons";
 
-import "../Styles/temp.css";
+import "../Styles/components/imageCarousel.css";
 
 export const ImageCarousel = ({ items, cosmeticType }) => {
   const [activeIndex, setActiveIndex] = useState(0);

@@ -1,7 +1,7 @@
 import NavBar from "../Components/NavBar";
 import styled from "styled-components";
 import Closet from "../Components/Closet";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useSearchParams, useNavigate } from "react-router-dom";
 import CosmeticIcon from "../Components/CosmeticIcon";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../supabase/supabaseClient";
@@ -37,9 +37,16 @@ const Cosmetics = () => {
   }, []);
 
   const initialCosmetics = useLoaderData();
+  let initialSearchResults = initialCosmetics;
+
+  const [searchParams] = useSearchParams();
+  const urlQuery = searchParams.get("search");
+
+  const navigate = useNavigate();
   const [cosmetics, setCosmetics] = useState(initialCosmetics);
-  const [searchResults, setSearchResults] = useState(initialCosmetics);
+  const [searchResults, setSearchResults] = useState(initialSearchResults);
   const [searchState, setSearchState] = useState("default");
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -49,6 +56,35 @@ const Cosmetics = () => {
   const [subcategories, setSubcategories] = useState([]);
 
   const LOAD_AMOUNT = 100;
+
+  useEffect(() => {
+    if (urlQuery && urlQuery.trim()) {
+      console.log("urlQuery:", urlQuery);
+
+      const fetchSearchResults = async () => {
+        const { data, error } = await supabase
+          .from("cosmetics")
+          .select(
+            `
+            *,
+            cosmetic_types(id, parent_type)
+          `
+          )
+          .ilike("name", `%${urlQuery}%`);
+
+        if (error) {
+          console.error("Error fetching search results:", error);
+          return;
+        }
+
+        setCosmetics(data);
+        setSearchResults(data);
+        setAllLoaded(true);
+      };
+
+      fetchSearchResults();
+    }
+  }, []); // empty array makes it run only once
 
   useEffect(() => {
     const fetchCosmeticTypes = async () => {
@@ -81,8 +117,15 @@ const Cosmetics = () => {
       console.log(selectedCategory);
       console.log(searchState);
 
+      //redirect state from cosmeticIcon
+      const urlQuery = searchParams.get("search");
+      console.log("urlquery", urlQuery);
+      if (urlQuery) {
+        query = query.ilike("name", `%${urlQuery.toLowerCase()}%`);
+      }
+
       // search bar query
-      if (searchQuery && searchState === "searchbar") {
+      else if (searchQuery && searchState === "searchbar") {
         console.log("searchbar query", searchQuery);
         query = query.ilike("name", `%${searchQuery.toLowerCase()}%`);
       }
@@ -164,6 +207,7 @@ const Cosmetics = () => {
     page,
     cosmeticTypes,
     allLoaded,
+    searchParams,
   ]);
 
   // detect if there's space at the bottom and load more cosmetics
@@ -227,10 +271,12 @@ const Cosmetics = () => {
 
   //search by input
   const handleSearch = (query) => {
+    navigate(`/cosmetics?search=${encodeURIComponent(query)}`);
     console.log(query);
     setSubcategories([]);
     setSearchState("searchbar");
     setSearchQuery(query);
+
     setPage(1);
 
     const filtered = cosmetics.filter((cosmetic) =>
@@ -242,8 +288,15 @@ const Cosmetics = () => {
     setSearchResults(filtered);
 
     // Allow more items to be loaded
-    setAllLoaded(false);
   };
+
+  useEffect(() => {
+    const query = searchParams.get("search");
+    if (query) {
+      setSearchQuery(query);
+      setAllLoaded(false);
+    }
+  }, [searchParams]);
 
   // filter results by category
   const handleCategorySelect = (category) => {

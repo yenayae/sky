@@ -1,32 +1,20 @@
-import { useLoaderData } from "react-router";
+import { useLoaderData, useNavigate } from "react-router";
 import NavBar from "../Components/NavBar";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import CosmeticIcon from "../Components/CosmeticIcon";
 import { supabase } from "../supabase/supabaseClient";
 import { ImageCarousel } from "../Components/ImageCarousel";
+import useFormatName from "../Hooks/formatName";
 
 const Details = styled.div`
   display: flex;
   flex-direction: row;
   padding: 20px;
-  // background-color: pink;
+  background-color: rgb(248, 248, 248);
+  border-radius: 10px;
   justify-content: center;
-`;
-
-const DetailsImage = styled.img`
-  width: 200px;
-  height: auto;
-`;
-
-const ImageBox = styled.div`
-  padding: 20px;
-  border: 1px solid #dadada;
-  border-radius: 20px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 80%;
 `;
 
 const DetailsH1 = styled.h1`
@@ -42,6 +30,8 @@ const DetailsTitle = styled.div`
 
 const DetailsBox = styled.div`
   padding: 0 20px;
+  width: 60%;
+  // background-color: green;
 `;
 
 function extractName(name) {
@@ -58,13 +48,15 @@ const CosmeticDetails = () => {
   const [cosmeticTypes, setCosmeticTypes] = useState([]);
   const [cosmeticType, setCosmeticType] = useState(null);
 
-  console.log(cosmeticInfo);
+  const navigate = useNavigate();
 
+  //set tab name to cosmetic name
   const cosmeticName = extractName(cosmeticInfo.name);
   useState(() => {
     document.title = cosmeticName;
   }, []);
 
+  //load in cosmetic types
   useEffect(() => {
     const fetchCosmeticTypes = async () => {
       const { data, error } = await supabase.from("cosmetic_types").select("*");
@@ -111,33 +103,46 @@ const CosmeticDetails = () => {
     if (cosmeticInfo?.id) {
       fetchCosmeticImages();
     }
-  }, [cosmeticInfo.id, cosmeticTypes]);
+  }, [cosmeticInfo.id, cosmeticInfo.type_id, cosmeticTypes]);
+
+  //for navbar search redirect
+  const handleSearchRedirect = (searchTerm) => {
+    navigate(`/cosmetics?search=${encodeURIComponent(searchTerm)}`);
+  };
 
   return (
     <div>
-      <NavBar></NavBar>
-      <Details>
-        <ImageCarousel
-          items={cosmeticImages}
-          cosmeticType={cosmeticType}
-        ></ImageCarousel>
-        <DetailsBox>
-          <DetailsTitle>
-            <DetailsH1>{cosmeticName}</DetailsH1>
-          </DetailsTitle>
-          <div>
-            <CosmeticIcon
-              key={cosmeticInfo.id}
-              cosmetic={cosmeticInfo}
-              cosmeticTypes={cosmeticTypes}
-              index={10}
-            ></CosmeticIcon>
-            <p>
-              Price: {cosmeticInfo.costNum} {cosmeticInfo.costType}
-            </p>
-          </div>
-        </DetailsBox>
-      </Details>
+      <NavBar page="cosmeticDetails" onSearch={handleSearchRedirect}></NavBar>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Details>
+          <ImageCarousel
+            items={cosmeticImages}
+            cosmeticType={cosmeticType}
+          ></ImageCarousel>
+          <DetailsBox>
+            <DetailsTitle>
+              <DetailsH1>{useFormatName(cosmeticName)}</DetailsH1>
+            </DetailsTitle>
+            <div>
+              <CosmeticIcon
+                key={cosmeticInfo.id}
+                cosmetic={cosmeticInfo}
+                cosmeticTypes={cosmeticTypes}
+                index={10}
+              ></CosmeticIcon>
+              <p>
+                Price: {cosmeticInfo.costNum} {cosmeticInfo.costType}
+              </p>
+            </div>
+          </DetailsBox>
+        </Details>
+      </div>
     </div>
   );
 };

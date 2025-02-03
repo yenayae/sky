@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { supabase } from "./supabase/supabaseClient";
@@ -16,7 +15,7 @@ import CreatePost from "./Pages/CreatePost";
 import EditPost from "./Pages/EditPost";
 import LikedPosts from "./Pages/LikedPosts";
 
-const cosmeticsLoader = async () => {
+const cosmeticsLoader = async ({ params }) => {
   const { data, error } = await supabase
     .from("cosmetics")
     .select(
