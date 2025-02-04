@@ -46,7 +46,6 @@ const Cosmetics = () => {
   const [cosmetics, setCosmetics] = useState(initialCosmetics);
   const [searchResults, setSearchResults] = useState(initialSearchResults);
   const [searchState, setSearchState] = useState("default");
-
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -99,6 +98,20 @@ const Cosmetics = () => {
     fetchCosmeticTypes();
   }, []);
 
+  //reset page
+  const resetPage = () => {
+    navigate("/cosmetics", { replace: true });
+    setSearchState("default");
+    setSearchQuery("");
+    setSelectedCategory(null);
+    setSubcategories([]);
+
+    setSearchResults([]);
+    setPage(1);
+
+    setAllLoaded(false);
+  };
+
   // fetch more cosmetics when user scrolls near bottom
   const loadMoreCosmetics = useCallback(async () => {
     if (allLoaded) return; //cancel if all items are loaded
@@ -120,7 +133,7 @@ const Cosmetics = () => {
       //redirect state from cosmeticIcon
       const urlQuery = searchParams.get("search");
       console.log("urlquery", urlQuery);
-      if (urlQuery) {
+      if (urlQuery && searchState !== "category") {
         query = query.ilike("name", `%${urlQuery.toLowerCase()}%`);
       }
 
@@ -182,11 +195,12 @@ const Cosmetics = () => {
         return [...prevCosmetics, ...newCosmetics];
       });
 
+      // + sort cosmetics by id
       setSearchResults((prevResults) => {
         const newResults = data.filter(
           (item) => !prevResults.some((prevItem) => prevItem.id === item.id)
         );
-        return [...prevResults, ...newResults];
+        return [...prevResults, ...newResults].sort((a, b) => a.id - b.id);
       });
 
       if (data.length === 0) {
@@ -287,6 +301,7 @@ const Cosmetics = () => {
     setSearchResults(filtered);
 
     // Allow more items to be loaded
+    setAllLoaded(false);
   };
 
   useEffect(() => {
@@ -372,7 +387,11 @@ const Cosmetics = () => {
 
   return (
     <div>
-      <NavBar page="cosmeticPage" onSearch={handleSearch} />
+      <NavBar
+        page="cosmeticPage"
+        cosmeticPageReset={resetPage}
+        onSearch={handleSearch}
+      />
       <div>
         <ClosetSelectSection>
           <ClosetContainer>

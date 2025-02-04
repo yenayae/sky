@@ -23,7 +23,7 @@
   align-items: center;
   justify-content: center;
 
-  animation: fadeIn 0.5s ease-in;
+  animation: fadeInOpacity 0.5s ease-in;
   min-height: 500px;
   width: 100%;
   height: auto;
@@ -35,7 +35,7 @@
   max-width: 250px;
 }
 
-@keyframes fadeIn {
+@keyframes fadeInOpacity {
   from {
     opacity: 0;
   }
@@ -57,7 +57,7 @@
   justify-content: space-evenly;
 
   animation-delay: 0.5s;
-  animation: fadeIn 0.5s ease-in;
+  animation: fadeInOpacity 0.4s ease-in;
 }
 
 .button-arrow {

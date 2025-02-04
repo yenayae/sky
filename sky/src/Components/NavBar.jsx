@@ -1,16 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faPlus, faHeart } from "@fortawesome/free-solid-svg-icons";
-import {
-  Link,
-  useNavigate,
-  useSearchParams,
-  useLocation,
-} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import COLORS from "../Styles/theme";
 import "../Styles/styles.css";
-
-import { useEffect, useState } from "react";
 
 const SearchForm = styled.form`
   flex: 1;
@@ -33,13 +26,15 @@ const SearchInput = styled.input`
   }
 `;
 
-export default function NavBar({ page, onSearch }) {
+export default function NavBar({ page, cosmeticPageReset, onSearch }) {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [shouldReload, setShouldReload] = useState(false);
 
-  const handleClick = () => {
-    navigate("/cosmetics", { replace: true });
+  const handleCosmeticsClick = () => {
+    if (cosmeticPageReset) {
+      cosmeticPageReset();
+    } else {
+      navigate("/cosmetics", { replace: true });
+    }
   };
 
   const handleSearch = (e) => {
@@ -74,7 +69,7 @@ export default function NavBar({ page, onSearch }) {
         </Link>
         <button
           className="nav-button"
-          onClick={handleClick}
+          onClick={handleCosmeticsClick}
           data-testid="cosmetics-button"
         >
           Cosmetics
