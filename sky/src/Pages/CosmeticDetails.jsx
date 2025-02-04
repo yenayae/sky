@@ -6,6 +6,7 @@ import CosmeticIcon from "../Components/CosmeticIcon";
 import { supabase } from "../supabase/supabaseClient";
 import { ImageCarousel } from "../Components/ImageCarousel";
 import useFormatName from "../Hooks/formatName";
+import useFormatPrice from "../Hooks/formatPrice";
 
 const Details = styled.div`
   display: flex;
@@ -47,6 +48,7 @@ const CosmeticDetails = () => {
   const [cosmeticImages, setCosmeticImages] = useState([]);
   const [cosmeticTypes, setCosmeticTypes] = useState([]);
   const [cosmeticType, setCosmeticType] = useState(null);
+  const [isLoadingImages, setIsLoadingImages] = useState(true);
 
   const navigate = useNavigate();
 
@@ -70,11 +72,12 @@ const CosmeticDetails = () => {
     fetchCosmeticTypes();
   }, []);
 
-  //load in cosmetic details
+  //load in cosmetic images
   useEffect(() => {
     const fetchCosmeticImages = async () => {
       if (!cosmeticTypes.length) return; // Ensure cosmeticTypes is loaded
 
+      setIsLoadingImages(true);
       try {
         const { data: cosmetic_images, error } = await supabase
           .from("cosmetic_images")
@@ -94,7 +97,7 @@ const CosmeticDetails = () => {
         }
 
         setCosmeticType(type);
-        console.log("cosmetic type", type);
+        setIsLoadingImages(false);
       } catch (error) {
         console.error("Error fetching cosmetic images:", error);
       }
@@ -124,7 +127,9 @@ const CosmeticDetails = () => {
           <ImageCarousel
             items={cosmeticImages}
             cosmeticType={cosmeticType}
-          ></ImageCarousel>
+            loadState={isLoadingImages}
+          />
+
           <DetailsBox>
             <DetailsTitle>
               <DetailsH1>{useFormatName(cosmeticName)}</DetailsH1>
@@ -137,7 +142,8 @@ const CosmeticDetails = () => {
                 index={10}
               ></CosmeticIcon>
               <p>
-                Price: {cosmeticInfo.costNum} {cosmeticInfo.costType}
+                Price:{" "}
+                {useFormatPrice(cosmeticInfo.costNum, cosmeticInfo.costType)}
               </p>
             </div>
           </DetailsBox>

@@ -1,9 +1,16 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faPlus, faHeart } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useSearchParams,
+  useLocation,
+} from "react-router-dom";
 import styled from "styled-components";
 import COLORS from "../Styles/theme";
 import "../Styles/styles.css";
+
+import { useEffect, useState } from "react";
 
 const SearchForm = styled.form`
   flex: 1;
@@ -27,6 +34,14 @@ const SearchInput = styled.input`
 `;
 
 export default function NavBar({ page, onSearch }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [shouldReload, setShouldReload] = useState(false);
+
+  const handleClick = () => {
+    navigate("/cosmetics", { replace: true });
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
     const query = e.target.elements.searchInput.value.trim();
@@ -57,11 +72,13 @@ export default function NavBar({ page, onSearch }) {
             Community
           </button>
         </Link>
-        <Link to="/cosmetics" style={{ height: "100%" }}>
-          <button className="nav-button" data-testid="cosmetics-button">
-            Cosmetics
-          </button>
-        </Link>
+        <button
+          className="nav-button"
+          onClick={handleClick}
+          data-testid="cosmetics-button"
+        >
+          Cosmetics
+        </button>
         <SearchForm className="search-form" onSubmit={handleSearch}>
           <SearchInput
             className="search-bar"

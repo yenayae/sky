@@ -8,7 +8,7 @@ import {
 
 import "../Styles/components/imageCarousel.css";
 
-export const ImageCarousel = ({ items, cosmeticType }) => {
+export const ImageCarousel = ({ items, cosmeticType, loadState }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const updateIndex = (newIndex) => {
@@ -23,7 +23,9 @@ export const ImageCarousel = ({ items, cosmeticType }) => {
 
   return (
     <div className="carousel">
-      {items.length === 0 ? ( // Render "no images" message when there are no items
+      {loadState ? (
+        <div className="loader">Loading...</div>
+      ) : items.length === 0 ? ( // Render "no images" message when there are no items
         <div className="no-images-carousel">
           <span>no images!</span>
         </div>
@@ -34,7 +36,7 @@ export const ImageCarousel = ({ items, cosmeticType }) => {
             className="inner"
             style={{
               transform: `translateX(-${activeIndex * 100}%)`,
-              transition: "transform 0.5s ease-in-out",
+              transition: "transform 0.4s ease-in-out",
             }}
           >
             {items.map((item, index) => (

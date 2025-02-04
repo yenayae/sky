@@ -58,7 +58,7 @@ const Cosmetics = () => {
   const LOAD_AMOUNT = 100;
 
   useEffect(() => {
-    if (urlQuery && urlQuery.trim()) {
+    if (urlQuery) {
       console.log("urlQuery:", urlQuery);
 
       const fetchSearchResults = async () => {
@@ -70,7 +70,7 @@ const Cosmetics = () => {
             cosmetic_types(id, parent_type)
           `
           )
-          .ilike("name", `%${urlQuery}%`);
+          .ilike("name", `%${urlQuery.trim()}%`);
 
         if (error) {
           console.error("Error fetching search results:", error);
@@ -272,7 +272,6 @@ const Cosmetics = () => {
   //search by input
   const handleSearch = (query) => {
     navigate(`/cosmetics?search=${encodeURIComponent(query)}`);
-    console.log(query);
     setSubcategories([]);
     setSearchState("searchbar");
     setSearchQuery(query);
@@ -300,6 +299,10 @@ const Cosmetics = () => {
 
   // filter results by category
   const handleCategorySelect = (category) => {
+    //clear url query
+    navigate(`/cosmetics`);
+    setSearchQuery("");
+
     //prevent reloading same categories
     if (searchState === "category" && selectedCategory === category) return;
 

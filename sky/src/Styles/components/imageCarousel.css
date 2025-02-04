@@ -7,6 +7,9 @@
   justify-content: center;
   border: 1px solid #dadada;
   border-radius: 20px;
+
+  min-height: 500px;
+  height: auto;
 }
 
 .inner {
@@ -19,10 +22,27 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 500px;
-  height: auto;
 
-  /* background-color: blue; */
+  animation: fadeIn 0.5s ease-in;
+  min-height: 500px;
+  width: 100%;
+  height: auto;
+}
+
+.carousel-item img {
+  /* background-color: pink; */
+  width: 70%;
+  max-width: 250px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .carousel-img {
@@ -35,6 +55,9 @@
 .carousel-buttons {
   display: flex;
   justify-content: space-evenly;
+
+  animation-delay: 0.5s;
+  animation: fadeIn 0.5s ease-in;
 }
 
 .button-arrow {
