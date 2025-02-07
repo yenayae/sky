@@ -269,7 +269,7 @@ const Cosmetics = () => {
         if (!isVisible) {
           clearInterval(interval); // stop the interval once loadMore is not visible
         }
-      }, 500); // check every 500ms
+      }, 1000); // check every 500ms
     };
 
     // initial check for visibility in case loadMore is already in view
@@ -300,8 +300,8 @@ const Cosmetics = () => {
     );
     setSearchResults(filtered);
 
-    // Allow more items to be loaded
-    setAllLoaded(false);
+    // Allow more items to be loaded EDIT: dont need this bc loadmore now checks for load regardless
+    // setAllLoaded(false);
   };
 
   useEffect(() => {

@@ -15,7 +15,7 @@ import CreatePost from "./Pages/CreatePost";
 import EditPost from "./Pages/EditPost";
 import LikedPosts from "./Pages/LikedPosts";
 
-const cosmeticsLoader = async ({ params }) => {
+const cosmeticsLoader = async () => {
   const { data, error } = await supabase
     .from("cosmetics")
     .select(
@@ -54,10 +54,10 @@ const router = createBrowserRouter([
   //   element: <SubmissionPage />,
   // },
 
-  // {
-  //   path: "/createPost",
-  //   element: <CreatePost />,
-  // },
+  {
+    path: "/createPost",
+    element: <CreatePost />,
+  },
 
   // {
   //   path: "/editPost/:id",
@@ -103,28 +103,41 @@ const router = createBrowserRouter([
       return data;
     },
   },
-  // {
-  //   path: "/blog",
-  //   element: <Community />,
-  //   loader() {
-  //     return fetch(SERVER + "/posts").then((response) => {
-  //       return response.json();
-  //     });
-  //   },
-  // },
+  {
+    path: "/blog",
+    element: <Community />,
+    loader: async () => {
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(100);
 
-  // {
-  //   path: "/blog/:id",
-  //   element: <PostDetails />,
-  //   loader({ params }) {
-  //     return fetch(`${SERVER}/posts/${params.id}`).then((response) => {
-  //       if (!response.ok) {
-  //         throw new Response("Post not found", { status: 404 });
-  //       }
-  //       return response.json();
-  //     });
-  //   },
-  // },
+      if (error) {
+        throw new Response("Cosmetic not found", { status: 404 });
+      }
+
+      return data;
+    },
+  },
+
+  {
+    path: "/blog/:id",
+    element: <PostDetails />,
+    loader: async ({ params }) => {
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("id", params.id)
+        .single();
+
+      if (error) {
+        throw new Response("Cosmetic not found", { status: 404 });
+      }
+
+      return data;
+    },
+  },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

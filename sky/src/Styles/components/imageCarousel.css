@@ -1,7 +1,6 @@
 .carousel {
   /* background-color: pink; */
   overflow: hidden;
-  width: 400px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -12,27 +11,65 @@
   height: auto;
 }
 
+.carousel.postPage {
+  background-color: rgb(248, 248, 248);
+  cursor: pointer;
+}
+
+.carousel.postPage.image-carousel-filled {
+  min-height: 0;
+}
+
+.post-images-carousel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.plus-icon {
+  color: #26343f;
+  font-size: 1.75rem;
+}
+
 .inner {
   white-space: nowrap;
+  /* display: flex; */
   transition: transform 0.3s;
+  /* width: 400px; */
+
+  /* overflow: hidden; */
   /* box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); */
 }
 
-.carousel-item {
+.carousel-item,
+.file-carousel-item {
   display: inline-flex;
-  align-items: center;
   justify-content: center;
 
   animation: fadeInOpacity 0.5s ease-in;
-  min-height: 500px;
-  width: 100%;
-  height: auto;
+
+  width: 400px;
+}
+
+.carousel-item {
+  align-items: center;
+}
+
+.file-carousel-item {
+  /* remove min height requirement for file carousel */
+  min-height: 0;
+  vertical-align: top;
 }
 
 .carousel-item img {
   /* background-color: pink; */
   width: 70%;
   max-width: 250px;
+}
+
+.file-carousel-item img {
+  width: 100%;
 }
 
 @keyframes fadeInOpacity {
@@ -47,7 +84,7 @@
 
 .carousel-img {
   /* background-color: aqua; */
-  width: 200px;
+  /* width: 500px; */
   /* height: auto; */
   padding: 20px 20px 0 20px;
 }
@@ -58,6 +95,8 @@
 
   animation-delay: 0.5s;
   animation: fadeInOpacity 0.4s ease-in;
+  background-color: rgb(248, 248, 248);
+  z-index: 100;
 }
 
 .button-arrow {

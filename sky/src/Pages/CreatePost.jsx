@@ -1,71 +1,145 @@
-import NavBar from "../Components/NavBar";
-import "../Styles/page_css/CreatePostPage.css";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { convertBlobUrlToFile } from "../lib/utils";
+import { uploadImage } from "../supabase/storageUpload";
+import NavBar from "../Components/NavBar";
+import { ImageCarousel } from "../Components/ImageCarousel";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import "../Styles/page_css/CreatePostPage.css";
 
 export default function CreatePost() {
-  useState(() => {
+  useEffect(() => {
     document.title = "Create Post";
   }, []);
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [image, setImage] = useState("");
+  const [imageUrls, setImageUrls] = useState([]);
   const navigate = useNavigate();
+  const imageInputRef = useRef(null);
+  const [isPending, startTransition] = useTransition();
+  const [isDesktop, setIsDesktop] = useState(
+    window.matchMedia("(min-width: 974px)").matches
+  );
 
-  const submitPost = (event) => {
-    event.preventDefault();
+  useEffect(() => {
+    window
+      .matchMedia("(min-width: 974px)")
+      .addEventListener("change", (e) => setIsDesktop(e.matches));
+  }, []);
 
-    // Creating a post
-    fetch("http://localhost:3000/posts", {
-      method: "POST",
-      body: JSON.stringify({
-        title: title,
-        body: body,
-        user_id: "0",
-        image: image,
-        likes: 0,
-      }),
-      headers: {
-        "Content-type": "application/json",
-      },
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((json) => {
-        console.log(json);
-        navigate("/blog");
-      });
+  const handleImageChange = (event) => {
+    if (event.target.files) {
+      const filesArray = Array.from(event.target.files);
+      const newImageUrls = filesArray.map((file) => URL.createObjectURL(file));
+
+      setImageUrls([...imageUrls, ...newImageUrls]);
+      console.log(newImageUrls);
+    }
   };
 
+  const clearImages = () => {
+    setImageUrls([]);
+  };
+
+  const handleSubmit = async () => {
+    startTransition(async () => {
+      let urls = [];
+      for (const url of imageUrls) {
+        const imageFile = await convertBlobUrlToFile(url);
+
+        const { imageUrl, error } = await uploadImage({
+          file: imageFile,
+          bucket: "posts_images",
+        });
+
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+        urls.push(imageUrl);
+      }
+
+      console.log(urls);
+      setImageUrls([]);
+    });
+  };
   return (
     <div>
       <NavBar page="createPostPage" />
       <div className="form-container">
-        <form className="form" action="" onSubmit={submitPost}>
-          <div className="input-container">
-            <input
-              type="text"
-              placeholder="title"
-              onChange={(event) => {
-                setTitle(event.target.value);
-              }}
-              required
-            />
-            <textarea
-              type="text"
-              placeholder="say something cool!"
-              onChange={(event) => {
-                setBody(event.target.value);
-              }}
-              required
+        <input
+          ref={imageInputRef}
+          type="file"
+          hidden
+          multiple
+          disabled={isPending}
+          onChange={handleImageChange}
+        />
+        <div
+          className={`post-creation-container ${
+            isDesktop ? "desktop" : "mobile"
+          }`}
+        >
+          <div
+            onClick={
+              imageUrls.length === 0
+                ? () => imageInputRef.current?.click()
+                : undefined
+            }
+            className="add-images"
+          >
+            <ImageCarousel
+              items={imageUrls}
+              pageContext={"postPage"}
+            ></ImageCarousel>
+            <FontAwesomeIcon
+              style={{ display: imageUrls.length === 0 ? "none" : "block" }}
+              onClick={imageUrls.length === 0 ? undefined : clearImages}
+              className="x-icon"
+              icon={faXmark}
             />
           </div>
-          <button className="post-button" type="submit">
-            Create Post
-          </button>
-        </form>
+          <div className="inputs-container">
+            {/* title */}
+            <div className="title-container">
+              <span className="input-name">Title</span>
+              <input
+                type="text"
+                className={`text-input ${isDesktop ? "desktop" : "mobile"}`}
+              />
+            </div>
+            {/* body*/}
+            <div className="body-container">
+              <span className="input-name">Body</span>
+              <textarea
+                name=""
+                id=""
+                className={`textarea-input ${isDesktop ? "desktop" : "mobile"}`}
+              ></textarea>
+            </div>
+            {/* tags */}
+            <div className="title-container">
+              <span className="input-name">Tags</span>
+              <input
+                type="text"
+                className={`text-input ${isDesktop ? "desktop" : "mobile"}`}
+              />
+            </div>
+
+            {/* tag cosmetics */}
+            <div className="body-container">
+              <span className="input-name">Tag Cosmetics</span>
+              <button className="cosmetics-tag-button">Add Cosmetics</button>
+            </div>
+          </div>
+        </div>
+
+        <button onClick={handleSubmit} disabled={isPending}>
+          upload
+        </button>
       </div>
     </div>
   );
