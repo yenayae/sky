@@ -1,5 +1,5 @@
 .cts-container {
-  background-color: pink;
+  background-color: #f7f7f7;
   width: 450px;
   min-height: 100vh;
 
@@ -7,8 +7,23 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+
+  max-height: 100vh; /* Adjust as needed */
+  overflow-y: auto;
+  padding-right: 0px;
+
+  /* position: absolute;
+  top: 0;
+  right: -450px; */
 }
 
+.cts-header {
+  background-color: pink;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .cts-search-wrapper {
   /* background-color: blue; */
   /* width: 90%; */
@@ -18,18 +33,19 @@
 }
 
 .cts-search-bar {
-  /* background-color: aqua; */
+  /* background-color: #dadada; */
   width: 340px;
   height: 50px;
   padding: 0 20px;
 
-  border: none;
+  border: 2px solid #dadada;
   border-radius: 15px;
 }
 
 .cts-results {
   display: flex;
   gap: 16px;
+  margin: 20px 0;
 }
 
 .cts-column {
@@ -37,6 +53,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  /* background-color: orange; */
 }
 
 .cts-tag {
@@ -52,6 +69,13 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  cursor: pointer;
+
+  transition: background-color 0.1s ease-out, opacity 0.3s ease-in-out;
+}
+
+.cts-tag:hover {
+  background-color: #dadada;
 }
 
 .cts-images {
@@ -64,13 +88,15 @@
 }
 
 .cts-icon {
+  background-color: rgba(124, 110, 104, 0.534);
+  border-radius: 10px;
+  padding: 2px;
+
   height: 50px;
   width: auto;
   position: absolute;
   bottom: 0px;
   left: 10px;
-
-  /* background-color: orange; */
 }
 
 .cts-display {
@@ -80,5 +106,28 @@
 }
 
 .cts-name {
+  margin-top: 10px;
   padding-left: 10px;
+  font-weight: 500;
+  font-size: 0.9em;
+}
+
+.cosmetics-tag-container {
+  position: fixed;
+  top: 0;
+  right: -100%; /* Start hidden outside the viewport */
+  width: 300px; /* Adjust width as needed */
+  height: 100vh;
+  background-color: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  transition: right 1s;
+  z-index: 100;
+}
+
+.slide-in {
+  right: 150px; /* Slide into view */
+}
+
+.hidden {
+  right: -100%; /* Keep it off-screen when hidden */
 }

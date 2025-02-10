@@ -1,15 +1,32 @@
+import { useState } from "react";
 import useFormatName from "../Hooks/formatName";
 
 export const CosmeticTag = ({ icon, display, name, type }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const iconUrl = `/img/cosmetics/${type}_icons/${icon}`;
   const displayUrl = `/img/cosmetics/${type}_view/${display}`;
   const formattedName = useFormatName(name);
 
   return (
-    <div className="cts-tag">
+    <div
+      className="cts-tag"
+      style={{
+        opacity: imageLoaded ? 1 : 0,
+      }}
+    >
       <div className="cts-images">
-        <img className="cts-icon" src={iconUrl} alt="" />
-        <img className="cts-display" src={displayUrl} alt={name} />
+        <img
+          className="cts-icon"
+          src={iconUrl}
+          alt={`${name} icon}`}
+          onLoad={() => setImageLoaded(true)}
+        />
+        <img
+          className="cts-display"
+          src={displayUrl}
+          alt={name}
+          onLoad={() => setImageLoaded(true)}
+        />
       </div>
       <span className="cts-name">{formattedName}</span>
     </div>

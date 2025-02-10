@@ -19,6 +19,7 @@ export default function CreatePost() {
   const [imageUrls, setImageUrls] = useState([]);
   const navigate = useNavigate();
   const imageInputRef = useRef(null);
+  const [showTagSearch, setShowTagSearch] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isDesktop, setIsDesktop] = useState(
     window.matchMedia("(min-width: 974px)").matches
@@ -29,6 +30,10 @@ export default function CreatePost() {
       .matchMedia("(min-width: 974px)")
       .addEventListener("change", (e) => setIsDesktop(e.matches));
   }, []);
+
+  const toggleTagSearch = () => {
+    setShowTagSearch((prev) => !prev);
+  };
 
   const handleImageChange = (event) => {
     if (event.target.files) {
@@ -133,7 +138,12 @@ export default function CreatePost() {
             {/* tag cosmetics */}
             <div className="body-container">
               <span className="input-name">Tag Cosmetics</span>
-              <button className="cosmetics-tag-button">Add Cosmetics</button>
+              <button
+                className="cosmetics-tag-button"
+                onClick={toggleTagSearch}
+              >
+                Add Cosmetics
+              </button>
             </div>
           </div>
         </div>
@@ -142,7 +152,13 @@ export default function CreatePost() {
           upload
         </button>
 
-        <CosmeticsTagSearch />
+        <div
+          className={`cosmetics-tag-container ${
+            showTagSearch ? "slide-in" : "hidden"
+          }`}
+        >
+          <CosmeticsTagSearch />
+        </div>
       </div>
     </div>
   );
