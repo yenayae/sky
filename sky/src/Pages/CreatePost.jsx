@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { convertBlobUrlToFile } from "../lib/utils";
 import { uploadImage } from "../supabase/storageUpload";
 import NavBar from "../Components/NavBar";
+import { CosmeticsTagSearch } from "../Components/CosmeticsTagSearch";
 import { ImageCarousel } from "../Components/ImageCarousel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -140,6 +141,8 @@ export default function CreatePost() {
         <button onClick={handleSubmit} disabled={isPending}>
           upload
         </button>
+
+        <CosmeticsTagSearch />
       </div>
     </div>
   );

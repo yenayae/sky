@@ -48,7 +48,7 @@ export const ImageCarousel = ({
     <div
       style={{ width: `${CAROUSEL_WIDTH}px` }}
       className={`carousel ${pageContext} ${
-        items.length === 0 ? "" : "image-carousel-filled"
+        items.length === 0 ? "image-carousel-empty" : "image-carousel-filled"
       }`}
     >
       {loadState ? (
