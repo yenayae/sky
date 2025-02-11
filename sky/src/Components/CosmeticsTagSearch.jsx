@@ -7,7 +7,7 @@ import { supabase } from "../supabase/supabaseClient";
 
 import { CosmeticTag } from "./CosmeticTag";
 
-export const CosmeticsTagSearch = () => {
+export const CosmeticsTagSearch = ({ toggleFunction, onTagSelect }) => {
   const [cosmeticTags, setCosmeticTags] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -41,11 +41,22 @@ export const CosmeticsTagSearch = () => {
     console.log(formattedData);
   };
 
+  const handleTagClick = (cosmetic) => {
+    onTagSelect(cosmetic);
+    toggleFunction();
+
+    console.log("tag clicked", cosmetic);
+  };
+
   return (
     <div className="cts-container">
       <div className="cts-header">
-        <span>Cosmetic Tags</span>
-        <FontAwesomeIcon icon={faXmark} className="cts-close" />
+        <span className="cts-header-name">Cosmetic Tags</span>
+        <FontAwesomeIcon
+          icon={faXmark}
+          className="cts-close"
+          onClick={toggleFunction}
+        />
       </div>
 
       <div className="cts-search-wrapper">
@@ -74,6 +85,7 @@ export const CosmeticsTagSearch = () => {
                     display={cosmetic.display}
                     name={cosmetic.name}
                     type={cosmetic.typeName}
+                    onClick={() => handleTagClick(cosmetic)}
                   />
                 ))}
             </div>
@@ -88,6 +100,7 @@ export const CosmeticsTagSearch = () => {
                     display={cosmetic.display}
                     name={cosmetic.name}
                     type={cosmetic.typeName}
+                    onClick={() => handleTagClick(cosmetic)}
                   />
                 ))}
             </div>

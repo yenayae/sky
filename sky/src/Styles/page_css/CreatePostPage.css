@@ -1,5 +1,9 @@
-.form-container {
+.post-page-wrapper {
   /* background-color: pink; */
+}
+
+.form-container {
+  /* background-color: blue; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -22,8 +26,15 @@
 }
 
 /* form inputs start */
+.upload-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
 .inputs-container {
-  /* background-color: pink; */
+  /* background-color: green; */
   width: auto;
   margin: 0 20px;
   /* padding: 10px; */
@@ -121,4 +132,115 @@
 .cosmetics-tag-button:hover {
   background-color: rgb(221, 220, 220);
 }
+
+.post-upload-button-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.post-upload-button {
+  /* background-color: #293374; */
+  /* color: white; */
+
+  background-color: #dadada;
+  color: black;
+  font-weight: 500;
+
+  height: 48px;
+  width: 100px;
+  border-radius: 15px;
+  border: none;
+  cursor: pointer;
+  padding: 10px 25px;
+  transition: 0.1s ease-out;
+
+  margin-right: 20px;
+}
+
+.post-upload-button:hover {
+  background-color: #293374;
+  color: white;
+}
+
 /* form inputs end */
+
+/* cosmetic tag display start */
+
+.tag-display-container {
+  /* background-color: blue; */
+}
+
+.tag-display-tags {
+  /* background-color: pink; */
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.tag-display-tags.desktop {
+  width: 540px;
+}
+
+.tag-display-tags.mobile {
+  width: 440px;
+}
+
+.tag-display-tag {
+  background-color: rgba(54, 48, 42, 0.685);
+  border-radius: 15px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 3px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: relative;
+}
+
+.tag-display-icon {
+  height: 90px;
+  width: auto;
+}
+
+.tag-display-x {
+  color: white;
+  position: absolute;
+  top: 7px;
+  right: 7px;
+
+  opacity: 0;
+  transition: 0.2s ease-in-out;
+
+  cursor: pointer;
+}
+
+.tag-display-tag:hover .tag-display-x {
+  opacity: 1;
+}
+
+.add-more-tags {
+  background-color: #e6e6e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 90px;
+  height: 94px;
+  border-radius: 15px;
+
+  cursor: pointer;
+}
+
+.tag-plus-icon {
+  background-color: #9e9e9e;
+  padding: 6px;
+  border-radius: 15px;
+  color: white;
+  /* border-radius: 50%; */
+}
+
+/* cosmetic tag display end */

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useFormatName from "../Hooks/formatName";
 
-export const CosmeticTag = ({ icon, display, name, type }) => {
+export const CosmeticTag = ({ icon, display, name, type, onClick }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const iconUrl = `/img/cosmetics/${type}_icons/${icon}`;
   const displayUrl = `/img/cosmetics/${type}_view/${display}`;
@@ -13,6 +13,7 @@ export const CosmeticTag = ({ icon, display, name, type }) => {
       style={{
         opacity: imageLoaded ? 1 : 0,
       }}
+      onClick={onClick}
     >
       <div className="cts-images">
         <img
