@@ -109,7 +109,8 @@ const router = createBrowserRouter([
     loader: async () => {
       const { data, error } = await supabase
         .from("posts")
-        .select("*")
+        .select("*, posts_images(image_url)")
+        .eq("posts_images.is_thumbnail", true)
         .order("created_at", { ascending: false })
         .limit(100);
 
@@ -127,7 +128,7 @@ const router = createBrowserRouter([
     loader: async ({ params }) => {
       const { data, error } = await supabase
         .from("posts")
-        .select("*")
+        .select("*, posts_images(image_url)")
         .eq("id", params.id)
         .single();
 

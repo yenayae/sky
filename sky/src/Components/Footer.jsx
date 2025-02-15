@@ -31,7 +31,7 @@ const FooterDivider = styled.hr`
   overflow: visible; /* For IE */
   padding: 0;
   border: none;
-  border-top: thick double grey;
+  border-top: medium double grey;
   color: grey;
   text-align: center;
   width: 100%;
@@ -40,7 +40,7 @@ const FooterDivider = styled.hr`
     content: "✧";
     display: inline-block;
     position: relative;
-    top: -0.95em;
+    top: -0.8em;
     font-size: 1em;
     padding: 0 0.75em;
     background: white;

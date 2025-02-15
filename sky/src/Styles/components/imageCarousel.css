@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border: 1px solid #dadada;
+
   border-radius: 20px;
 
   min-height: 500px;
@@ -14,8 +14,18 @@
 .carousel.postPage {
   background-color: rgb(248, 248, 248);
 }
+
+.carousel.postPage.error {
+  background-color: rgba(236, 208, 208, 0.986);
+  border: 1px solid #e75858;
+}
+
+.carousel.cosmeticDetails {
+  border: 1px solid #dadada;
+}
 .carousel.postPage.image-carousel-empty {
   cursor: pointer;
+  border: 1px solid #dadada;
 }
 
 .carousel.postPage.image-carousel-filled {
@@ -109,14 +119,20 @@
   background: none;
   border: none;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 5px;
+  color: #26343f;
+}
+
+.button-arrow.disabled {
+  cursor: default;
+  color: rgb(175, 175, 175);
 }
 
 .indicators {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin-top: 25px;
+  margin-top: 5px;
 }
 
 .indicator-buttons {
@@ -145,4 +161,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.error-container {
+  width: 40%;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 1.7em;
+}
+
+.error-message {
+  margin-top: 5px;
 }

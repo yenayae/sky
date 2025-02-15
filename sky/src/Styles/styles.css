@@ -8,20 +8,6 @@
   filter: drop-shadow(0 0px 5px var(--glow-color));
 }
 
-.post {
-  padding: 5px;
-  transition: background-color 0.2s ease;
-}
-
-.post:hover {
-  background-color: #eeebeb;
-}
-
-.post-heart {
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
 .nav-button {
   background-color: #e6e4e5;
   border: none;
@@ -36,6 +22,19 @@
 .nav-button:hover {
   background-color: #b9b2ac;
   color: white;
+}
+
+.error,
+.error-message,
+.error-icon {
+  color: rgb(228, 33, 33);
+}
+
+.flex-column-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .liked-post {

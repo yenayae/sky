@@ -128,6 +128,7 @@ const CosmeticDetails = () => {
             items={cosmeticImages}
             cosmeticType={cosmeticType}
             loadState={isLoadingImages}
+            pageContext={"cosmeticDetails"}
           />
 
           <DetailsBox>

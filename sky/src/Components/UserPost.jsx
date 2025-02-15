@@ -1,70 +1,46 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
-import "../Styles/heartAnimation.css";
+import "../Styles/components/userPost.css";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import useLike from "../Hooks/useLike";
 
 export default function UserPost({ postInfo }) {
-  const imageLink = postInfo.image ? "img/" + postInfo.image : null;
+  const imageLink =
+    postInfo.posts_images.length > 0
+      ? `https://epybsqrrtinvvbvqjnyt.supabase.co/${postInfo.posts_images[0].image_url}`
+      : null;
   const title = postInfo.title;
   const caption = postInfo.body || "";
   const [isLiked, handleLikeToggle] = useLike(postInfo.id);
+  const [imageLoaded, setImageLoaded] = useState(!imageLink);
 
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        marginBottom: "20px",
-        position: "relative",
-        alignItems: "center",
-      }}
       className="user-post"
       data-testid="user-post"
+      style={{
+        opacity: imageLoaded ? 1 : 0,
+      }}
     >
+      {/* render either image post or text post */}
       {imageLink ? (
-        <div
-          style={{
-            borderRadius: "10px",
-          }}
-          className="post"
-        >
+        <div className="post">
           <Link to={`/blog/${postInfo.id}`} style={{ textDecoration: "none" }}>
             <img
-              style={{
-                width: "200px",
-                height: "auto",
-                borderRadius: "10px",
-                cursor: "pointer",
-              }}
+              className="post-image"
               src={imageLink}
               alt={postInfo.image}
+              onLoad={() => setImageLoaded(true)}
             />
           </Link>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0 2px",
-              width: "100%",
-            }}
-          >
+          <div className="post-items">
             <Link
               to={`/blog/${postInfo.id}`}
               style={{ textDecoration: "none" }}
             >
-              <span
-                style={{
-                  margin: "5px 0",
-                  fontWeight: "500",
-                  fontSize: ".9em",
-                  color: "black",
-                }}
-              >
-                {title}
-              </span>
+              <span className="post-title">{title}</span>
             </Link>
             <span className="hover-heart">
               <FontAwesomeIcon
@@ -90,44 +66,14 @@ export default function UserPost({ postInfo }) {
           // className="post"
         >
           <Link to={`/blog/${postInfo.id}`} style={{ textDecoration: "none" }}>
-            <h2
-              style={{
-                margin: "5px",
-                fontSize: "1.5em",
-                fontWeight: "bold",
-                color: "black",
-              }}
-            >
-              {title}
-            </h2>
+            <h2 className="text-post-title">{title}</h2>
           </Link>
 
-          <hr
-            style={{
-              width: "95%",
-            }}
-          />
+          <hr className="text-post-divider" />
 
-          {caption && (
-            <p
-              style={{
-                fontSize: ".9em",
-                color: "#555",
-                margin: "5px",
-              }}
-            >
-              {caption}
-            </p>
-          )}
+          {caption && <p className="text-post-caption">{caption}</p>}
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              paddingRight: "5px",
-              paddingBottom: "5px",
-            }}
-          >
+          <div className="text-post-heart">
             <span className="hover-heart">
               <FontAwesomeIcon
                 icon={faHeart}

@@ -5,6 +5,7 @@ import {
   faChevronLeft,
   faChevronRight,
   faSquarePlus,
+  faCircleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 
 import "../Styles/components/imageCarousel.css";
@@ -15,6 +16,7 @@ export const ImageCarousel = ({
   cosmeticType,
   loadState,
   pageContext,
+  errorMessage,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [firstImageHeight, setFirstImageHeight] = useState(null);
@@ -34,6 +36,8 @@ export const ImageCarousel = ({
 
   useEffect(() => {
     if (items.length > 0) {
+      setActiveIndex(0);
+
       const firstImg = new Image();
       firstImg.src = items[0];
       firstImg.onload = () => {
@@ -49,7 +53,9 @@ export const ImageCarousel = ({
       style={{ width: `${CAROUSEL_WIDTH}px` }}
       className={`carousel ${pageContext} ${
         items.length === 0 ? "image-carousel-empty" : "image-carousel-filled"
-      }`}
+      }
+      ${errorMessage ? "error" : ""}
+      `}
     >
       {loadState ? (
         <div className="loader">Loading...</div>
@@ -58,7 +64,17 @@ export const ImageCarousel = ({
 
         pageContext === "postPage" ? (
           <div className="post-images-carousel">
-            <FontAwesomeIcon className="plus-icon" icon={faSquarePlus} />
+            {errorMessage ? (
+              <div className="flex-column-center error-container">
+                <FontAwesomeIcon
+                  className="error-icon"
+                  icon={faCircleExclamation}
+                />
+                <span className="error-message">{errorMessage}</span>
+              </div>
+            ) : (
+              <FontAwesomeIcon className="plus-icon" icon={faSquarePlus} />
+            )}
           </div>
         ) : (
           <div className="no-images-carousel">
@@ -96,7 +112,7 @@ export const ImageCarousel = ({
           </div>
           <div className="carousel-buttons">
             <button
-              className="button-arrow"
+              className={`button-arrow ${items.length === 1 ? "disabled" : ""}`}
               onClick={() => updateIndex(activeIndex - 1)}
             >
               <FontAwesomeIcon icon={faChevronLeft} />
@@ -121,7 +137,7 @@ export const ImageCarousel = ({
               ))}
             </div>
             <button
-              className="button-arrow"
+              className={`button-arrow ${items.length === 1 ? "disabled" : ""}`}
               onClick={() => updateIndex(activeIndex + 1)}
             >
               <FontAwesomeIcon icon={faChevronRight} />

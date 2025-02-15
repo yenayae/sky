@@ -1,6 +1,15 @@
 .post-page-wrapper {
   /* background-color: pink; */
 }
+.post-page-body {
+  /* background-color: pink; */
+  height: 90vh;
+
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: space-between;
+}
 
 .form-container {
   /* background-color: blue; */
@@ -8,6 +17,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  margin-bottom: 50px;
 }
 
 .post-creation-container {
@@ -72,15 +83,33 @@
   transition: 0.3s ease-in-out;
 }
 
+.x-icon:hover {
+  background-color: #e4e4e4;
+}
+
 .x-icon:active {
   background-color: #26343f;
   color: white;
 }
 
-.input-name {
+.input-span {
   color: grey;
   font-size: 0.8em;
   margin-bottom: 10px;
+}
+
+.error {
+  color: rgb(228, 33, 33);
+}
+
+.input-span.error {
+  margin-top: 5px;
+}
+
+.input-span.cosmetic-tag-error {
+  color: rgb(228, 33, 33);
+  position: relative;
+  top: -15px;
 }
 
 .title-container,
@@ -159,8 +188,8 @@
 }
 
 .post-upload-button:hover {
-  background-color: #293374;
-  color: white;
+  background-color: #a0a0a0;
+  /* color: white; */
 }
 
 /* form inputs end */

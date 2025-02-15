@@ -34,10 +34,13 @@ export const SelectedCosmeticTagDisplay = ({
             />
           </div>
         ))}
-
-        <div className="add-more-tags" onClick={toggleFunction}>
-          <FontAwesomeIcon icon={faPlus} className="tag-plus-icon" />
-        </div>
+        {selectedCosmeticTags.length >= 10 ? (
+          ""
+        ) : (
+          <div className="add-more-tags" onClick={toggleFunction}>
+            <FontAwesomeIcon icon={faPlus} className="tag-plus-icon" />
+          </div>
+        )}
       </div>
     </div>
   );
