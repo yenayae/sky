@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CosmeticCarouselItem } from "./CosmeticCarouselItem";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -22,6 +22,8 @@ export const ImageCarousel = ({
   const [firstImageHeight, setFirstImageHeight] = useState(null);
   const CAROUSEL_WIDTH = 400;
 
+  const prevItemsRef = useRef(items);
+
   const updateIndex = (newIndex) => {
     if (newIndex < 0) {
       newIndex = 0;
@@ -35,9 +37,15 @@ export const ImageCarousel = ({
   };
 
   useEffect(() => {
-    if (items.length > 0) {
-      setActiveIndex(0);
+    const itemsChanged =
+      JSON.stringify(items) !== JSON.stringify(prevItemsRef.current);
 
+    if (itemsChanged) {
+      setActiveIndex(0);
+      prevItemsRef.current = items;
+    }
+
+    if (items.length > 0) {
       const firstImg = new Image();
       firstImg.src = items[0];
       firstImg.onload = () => {

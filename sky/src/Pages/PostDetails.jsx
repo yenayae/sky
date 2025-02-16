@@ -1,10 +1,11 @@
 import { useLoaderData } from "react-router-dom";
 import NavBar from "../Components/NavBar";
+import OptionsMenu from "../Components/OptionsMenu";
 import styled from "styled-components";
 import COLORS from "../Styles/theme";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
 import "../Styles/page_css/postDetails.css";
@@ -14,21 +15,19 @@ import { ImageCarousel } from "../Components/ImageCarousel";
 import useLike from "../Hooks/useLike";
 
 const PostDetails = () => {
-  useState(() => {
+  useEffect(() => {
     document.title = "Post Details";
   }, []);
 
   const postDetails = useLoaderData();
 
-  console.log("postDetails", postDetails);
-  console.log("post images array", postDetails.posts_images);
+  console.log(postDetails);
 
   //post details metadata
   const postID = postDetails.id;
   const imagesArray = postDetails.posts_images.map((image) => {
     return `https://epybsqrrtinvvbvqjnyt.supabase.co/${image.image_url}`;
   });
-  console.log("imagesArray", imagesArray);
   const title = postDetails.title;
   const body = postDetails.body;
   const likes = postDetails.likes;
@@ -43,6 +42,25 @@ const PostDetails = () => {
   if (CURRENT_USER === postUserID) {
     isPostOwner = true;
   }
+
+  //options menu functions
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+  const toggleMenu = () => {
+    console.log("toggle menu!");
+    setShowOptionsMenu(!showOptionsMenu);
+  };
+
+  const handleEdit = () => {
+    console.log("edit post!");
+  };
+
+  const handleDownload = () => {
+    console.log("download image!");
+  };
+
+  const handleReport = () => {
+    console.log("report post!");
+  };
 
   return (
     <div>
@@ -79,13 +97,40 @@ const PostDetails = () => {
                 </div>
               </div>
               <div className="items-container">
-                <FontAwesomeIcon
-                  className="post-heart"
-                  icon={faHeart}
-                  color={isLiked ? "#d94e72" : "#cccccc"}
-                  size="2x"
-                  onClick={handleLikeToggle}
-                />
+                {showOptionsMenu && (
+                  <OptionsMenu
+                    handleEdit={handleEdit}
+                    handleReport={handleReport}
+                    handleDownload={handleDownload}
+                  />
+                )}
+
+                <div className="items-details">
+                  <span className="num-likes">
+                    {likes} {likes === 1 ? "like" : "likes"}
+                  </span>
+                  <div className="icons-container">
+                    <FontAwesomeIcon
+                      className="post-heart postDetails-heart"
+                      icon={faHeart}
+                      color={isLiked ? "#d94e72" : "#cccccc"}
+                      // size="2x"
+                      onClick={handleLikeToggle}
+                    />
+
+                    <FontAwesomeIcon
+                      icon={faEllipsis}
+                      className="post-options"
+                      onClick={toggleMenu}
+                      style={{
+                        backgroundColor: showOptionsMenu
+                          ? "rgb(182, 182, 182)"
+                          : "transparent",
+                        color: showOptionsMenu ? "white" : "#b3b3b3",
+                      }}
+                    />
+                  </div>
+                </div>
                 <div className="comment-container">
                   <textarea
                     className="comment-box"

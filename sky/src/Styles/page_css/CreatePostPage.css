@@ -1,9 +1,6 @@
-.post-page-wrapper {
-  /* background-color: pink; */
-}
 .post-page-body {
   /* background-color: pink; */
-  height: 90vh;
+  height: 91vh;
 
   display: flex;
   flex-direction: column;
