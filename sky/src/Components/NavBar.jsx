@@ -1,5 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse, faPlus, faHeart } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHouse,
+  faPlus,
+  faHeart,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
@@ -130,7 +135,7 @@ export default function NavBar({ page, cosmeticPageReset, onSearch }) {
           style={{ height: "100%" }}
         >
           <button className="nav-button" data-testid="likedPosts-button">
-            <FontAwesomeIcon icon={faHeart} />
+            <FontAwesomeIcon icon={faUser} />
           </button>
         </Link>
       </div>

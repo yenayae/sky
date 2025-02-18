@@ -1,8 +1,12 @@
 // useLike.js
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase/supabaseClient";
+import { useAuth } from "./authContext";
 
-const useLike = (postID, currentUserID = "0") => {
+const useLike = (postID) => {
+  const { user } = useAuth();
+  const currentUserID = user?.id;
+
   const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {

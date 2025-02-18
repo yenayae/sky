@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../supabase/supabaseClient";
 
 import "../Styles/page_css/loginPage.css";
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -23,7 +25,8 @@ export default function Login() {
       .addEventListener("change", (e) => setIsDesktop(e.matches));
   }, []);
 
-  const handleLogin = async () => {
+  const handleLogin = async (event) => {
+    event.preventDefault();
     if (isLoggingIn) return;
 
     setIsLoggingIn(true);
@@ -37,6 +40,11 @@ export default function Login() {
 
     if (password.trim() === "") {
       setError("Password is required");
+    }
+
+    if (emailError || passwordError || error) {
+      setIsLoggingIn(false);
+      return;
     }
 
     let loginEmail = emailOrUsername.trim(); // This input field will accept email or username
@@ -65,10 +73,13 @@ export default function Login() {
 
     if (loginError) {
       setError(loginError.message);
+      setIsLoggingIn(false);
+      return;
     }
 
     console.log("logged in!");
     setIsLoggingIn(false);
+    navigate("/blog");
   };
 
   return (
@@ -80,7 +91,7 @@ export default function Login() {
             width: isDesktop ? "750px" : "440px",
           }}
         >
-          <div className="login-section">
+          <form className="login-section" onSubmit={handleLogin}>
             <div className="login-header">
               <h2 className="login-title">Log In</h2>
             </div>
@@ -134,7 +145,7 @@ export default function Login() {
             <div className="login-input-container">
               <button
                 className={`login-button ${isLoggingIn && "loading"}`}
-                onClick={handleLogin}
+                type="submit"
                 disabled={isLoggingIn}
               >
                 {isLoggingIn ? "logging in..." : "Log In"}
@@ -143,7 +154,7 @@ export default function Login() {
                 New User? <Link to={"/signup"}>Sign Up</Link>
               </span>
             </div>
-          </div>
+          </form>
           {isDesktop && (
             <div className="login-right-display">
               <img

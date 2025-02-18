@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../supabase/supabaseClient";
 import DOMPurify from "dompurify";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faXmark,
-  faTriangleExclamation,
-  faCheck,
-} from "@fortawesome/free-solid-svg-icons";
-
-import { ErrorSpan } from "../Components/ErrorSpan";
+import { faXmark, faCheck } from "@fortawesome/free-solid-svg-icons";
 
 export default function Signup() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -43,9 +39,10 @@ export default function Signup() {
       .addEventListener("change", (e) => setIsDesktop(e.matches));
   }, []);
 
-  const handleSignup = async () => {
-    //validate inputs first
+  const handleSignup = async (event) => {
+    event.preventDefault();
 
+    //validate inputs first
     setEmail(sanitizeInput(email));
     setUsername(sanitizeInput(username));
     setPassword(sanitizeInput(password));
@@ -56,7 +53,6 @@ export default function Signup() {
 
     if (!isEmailValid || !isUsernameValid || !isPasswordValid) {
       setError("Invalid inputs");
-
       return;
     }
 
@@ -83,10 +79,12 @@ export default function Signup() {
       if (profileError) {
         setError(profileError.message);
         console.log(profileError.message);
+        return;
       }
     }
 
     console.log("successfully signe dup?");
+    navigate("/login");
   };
 
   //   validation functions
@@ -170,7 +168,7 @@ export default function Signup() {
             width: isDesktop ? "750px" : "440px",
           }}
         >
-          <div className="login-section">
+          <form className="login-section" onSubmit={handleSignup}>
             <div className="login-header">
               <h2 className="login-title">Create an account</h2>
             </div>
@@ -286,14 +284,14 @@ export default function Signup() {
             </div>
 
             <div className="login-input-container">
-              <button className="login-button" onClick={handleSignup}>
+              <button className="login-button" type="submit">
                 Sign Up
               </button>
               <span className="input-prompt">
                 Already have an account? <Link to={"/login"}>Log in</Link>
               </span>
             </div>
-          </div>
+          </form>
           {isDesktop && (
             <div className="login-right-display">
               <img
