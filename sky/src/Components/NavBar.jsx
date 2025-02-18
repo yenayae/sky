@@ -1,6 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faPlus, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+
+import { useAuth } from "../Hooks/authContext";
+import { supabase } from "../supabase/supabaseClient";
+
 import styled from "styled-components";
 import COLORS from "../Styles/theme";
 import "../Styles/styles.css";
@@ -28,6 +33,29 @@ const SearchInput = styled.input`
 
 export default function NavBar({ page, cosmeticPageReset, onSearch }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const [currentUser, setCurrentUsername] = useState("");
+  console.log(user);
+
+  useEffect(() => {
+    const getUsername = async () => {
+      if (!user) return; // Ensure user exists
+      const { data, error } = await supabase
+        .from("users")
+        .select("username")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching user:", error);
+      } else {
+        setCurrentUsername(data.username);
+      }
+    };
+
+    getUsername();
+  }, [user]);
 
   const handleCosmeticsClick = () => {
     if (cosmeticPageReset) {
@@ -97,7 +125,10 @@ export default function NavBar({ page, cosmeticPageReset, onSearch }) {
             <FontAwesomeIcon icon={faPlus} />
           </button>
         </Link>
-        <Link to={`/likedPosts/${CURRENT_USER}`} style={{ height: "100%" }}>
+        <Link
+          to={currentUser ? `/profile/${currentUser}` : "/login"}
+          style={{ height: "100%" }}
+        >
           <button className="nav-button" data-testid="likedPosts-button">
             <FontAwesomeIcon icon={faHeart} />
           </button>

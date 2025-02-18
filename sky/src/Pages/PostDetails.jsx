@@ -50,6 +50,10 @@ const PostDetails = () => {
     setShowOptionsMenu(!showOptionsMenu);
   };
 
+  const handleDelete = () => {
+    console.log("delete post!");
+  };
+
   const handleEdit = () => {
     console.log("edit post!");
   };
@@ -68,8 +72,16 @@ const PostDetails = () => {
       <div className="post-details-container">
         <div className="post-details-box">
           <div className="post-container">
-            <ImageCarousel items={imagesArray} pageContext={"postPage"} />
-            <div className="text-details-box">
+            {imagesArray.length > 0 && (
+              <ImageCarousel items={imagesArray} pageContext={"postPage"} />
+            )}
+
+            <div
+              className="text-details-box"
+              style={{
+                width: imagesArray.length > 0 ? "300px" : "550px",
+              }}
+            >
               <div
                 style={{
                   margin: "10px",
@@ -99,6 +111,7 @@ const PostDetails = () => {
               <div className="items-container">
                 {showOptionsMenu && (
                   <OptionsMenu
+                    handleDelete={handleDelete}
                     handleEdit={handleEdit}
                     handleReport={handleReport}
                     handleDownload={handleDownload}
@@ -136,6 +149,9 @@ const PostDetails = () => {
                     className="comment-box"
                     type="text"
                     placeholder="Add a comment..."
+                    style={{
+                      width: imagesArray.length > 0 ? "258px" : "508px",
+                    }}
                   />
                 </div>
               </div>

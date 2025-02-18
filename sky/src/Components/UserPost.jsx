@@ -67,12 +67,11 @@ export default function UserPost({ postInfo }) {
         >
           <Link to={`/blog/${postInfo.id}`} style={{ textDecoration: "none" }}>
             <h2 className="text-post-title">{title}</h2>
+
+            <hr className="text-post-divider" />
+
+            {caption && <p className="text-post-caption">{caption}</p>}
           </Link>
-
-          <hr className="text-post-divider" />
-
-          {caption && <p className="text-post-caption">{caption}</p>}
-
           <div className="text-post-heart">
             <span className="hover-heart">
               <FontAwesomeIcon

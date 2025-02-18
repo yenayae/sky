@@ -69,6 +69,8 @@
   flex-direction: column;
   align-items: flex-end;
   padding: 10px;
+
+  position: relative;
 }
 
 .items-details {
@@ -95,6 +97,7 @@
   /* background-color: rgb(253, 253, 253); */
 
   border: 1px solid #f0f0f0;
+  background-color: white;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -102,6 +105,9 @@
   padding: 5px 5px;
 
   margin-bottom: 10px;
+
+  position: absolute;
+  bottom: 100px;
 }
 
 .options-item {
@@ -115,7 +121,7 @@
 }
 
 .options-item:hover {
-  background-color: #f0f0f0;
+  background-color: #e2e2e2;
 }
 
 .post-heart.postDetails-heart,

@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
+import { useAuth } from "../Hooks/authContext";
+
 import "../Styles/contactButton.css";
 
 const Content = styled.div`
@@ -36,9 +38,7 @@ const Divider = styled.hr`
 `;
 
 const Home = () => {
-  useState(() => {
-    document.title = "Home Page";
-  }, []);
+  const { user } = useAuth();
 
   return (
     <div>

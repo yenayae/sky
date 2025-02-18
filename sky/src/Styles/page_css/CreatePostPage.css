@@ -111,11 +111,24 @@
 
 .title-container,
 .body-container {
+  position: relative;
+
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   margin-bottom: 10px;
+
+  /* background-color: pink; */
+}
+
+.title-character-count {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+
+  font-size: 0.7em;
+  color: rgb(155, 155, 155);
 }
 
 .text-input {

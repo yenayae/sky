@@ -23,8 +23,11 @@ export default function CreatePost() {
     document.title = "Create Post";
   }, []);
 
+  const TITLE_CHARACTER_LIMIT = 50;
+
   const [imageUrls, setImageUrls] = useState([]);
   const [selectedCosmeticTags, setSelectedCosmeticTags] = useState([]);
+  const [titleCharacterCount, setTitleCharacterCount] = useState(0);
 
   //error handling variables
   const [titleError, setTitleError] = useState("");
@@ -85,8 +88,10 @@ export default function CreatePost() {
       return false;
     }
 
-    if (title.length > 100) {
-      setTitleError("Title is too long (max 100 characters)");
+    if (title.length > TITLE_CHARACTER_LIMIT) {
+      setTitleError(
+        `Title is too long (max ${TITLE_CHARACTER_LIMIT} characters)`
+      );
       return false;
     }
 
@@ -179,6 +184,16 @@ export default function CreatePost() {
 
   const clearImages = () => {
     setImageUrls([]);
+  };
+
+  const calculateCharacterCount = (text) => {
+    console.log(text.length);
+
+    if (text.length > TITLE_CHARACTER_LIMIT) {
+      return;
+    }
+
+    setTitleCharacterCount(text.length);
   };
 
   //submit function
@@ -323,7 +338,13 @@ export default function CreatePost() {
                       className={`text-input ${
                         isDesktop ? "desktop" : "mobile"
                       }`}
+                      onChange={(e) => calculateCharacterCount(e.target.value)}
+                      maxLength={TITLE_CHARACTER_LIMIT}
                     />
+
+                    <span className="title-character-count">
+                      {titleCharacterCount}/{TITLE_CHARACTER_LIMIT}
+                    </span>
 
                     {titleError.length > 0 ? (
                       <ErrorSpan message={titleError} />

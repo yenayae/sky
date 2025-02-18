@@ -8,6 +8,10 @@
   filter: drop-shadow(0 0px 5px var(--glow-color));
 }
 
+a {
+  color: rgb(70, 144, 204);
+}
+
 .nav-button {
   background-color: #e6e4e5;
   border: none;

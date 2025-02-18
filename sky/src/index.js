@@ -12,8 +12,13 @@ import CosmeticDetails from "./Pages/CosmeticDetails";
 import ContactPage from "./Pages/ContactPage";
 import SubmissionPage from "./Pages/SubmissionPage";
 import CreatePost from "./Pages/CreatePost";
+import Login from "./Pages/Login";
+import Signup from "./Pages/Signup";
+import UserProfile from "./Pages/UserProfile";
 import EditPost from "./Pages/EditPost";
 import LikedPosts from "./Pages/LikedPosts";
+
+import { AuthProvider } from "./Hooks/authContext";
 
 const cosmeticsLoader = async () => {
   const { data, error } = await supabase
@@ -59,27 +64,38 @@ const router = createBrowserRouter([
     element: <CreatePost />,
   },
 
-  // {
-  //   path: "/editPost/:id",
-  //   element: <EditPost />,
-  //   loader({ params }) {
-  //     return fetch(`${SERVER}/posts/${params.id}`).then((response) => {
-  //       return response.json();
-  //     });
-  //   },
-  // },
+  {
+    path: "/login",
+    element: <Login />,
+  },
 
-  // {
-  //   path: "/likedPosts/:id",
-  //   element: <LikedPosts />,
-  //   loader({ params }) {
-  //     return fetch(`${SERVER}/likedPosts?user_id=${params.id}`).then(
-  //       (response) => {
-  //         return response.json();
-  //       }
-  //     );
-  //   },
-  // },
+  {
+    path: "/signup",
+    element: <Signup />,
+  },
+
+  {
+    path: "/profile/:username",
+    element: <UserProfile />,
+    loader: async ({ params }) => {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("username", params.username)
+        .single();
+
+      if (error) {
+        throw new Response("User not found", { status: 404 });
+      }
+
+      return data;
+    },
+  },
+
+  {
+    path: "/passwordReset",
+    element: <Signup />,
+  },
 
   {
     path: "/cosmetics",
@@ -143,9 +159,11 @@ const router = createBrowserRouter([
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
+  <AuthProvider>
+    <React.StrictMode>
+      <RouterProvider router={router} />
+    </React.StrictMode>
+  </AuthProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
