@@ -76,6 +76,16 @@ export default function UserProfile() {
     fetchLikedPosts();
   }, []);
 
+  const handlePostCategoryClick = () => {
+    setContentTabSelected("posts");
+    fetchUserPosts();
+  };
+
+  const handleLikeCategoryClick = () => {
+    setContentTabSelected("likes");
+    fetchLikedPosts();
+  };
+
   console.log(userInfo);
 
   return (
@@ -104,7 +114,7 @@ export default function UserProfile() {
               className={`profile-content-tab ${
                 contentTabSelected === "posts" && "selected"
               }`}
-              onClick={() => setContentTabSelected("posts")}
+              onClick={handlePostCategoryClick}
             >
               Posts
             </span>
@@ -112,7 +122,7 @@ export default function UserProfile() {
               className={`profile-content-tab ${
                 contentTabSelected === "likes" && "selected"
               }`}
-              onClick={() => setContentTabSelected("likes")}
+              onClick={handleLikeCategoryClick}
             >
               Likes
             </span>
