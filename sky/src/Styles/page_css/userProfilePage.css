@@ -6,6 +6,8 @@
   align-items: flex-end;
 
   padding: 10px 30px;
+
+  position: relative;
 }
 
 .profile-user-info {
@@ -21,8 +23,8 @@
 }
 
 .profile-image {
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
   object-fit: cover;
 
   border-radius: 50%;
@@ -30,16 +32,23 @@
   margin-right: 25px;
 }
 
+.username-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .profile-username {
   /* background-color: red; */
-  font-size: 3em;
+  font-size: 2.5em;
   font-weight: 600;
   margin: 0;
 }
 
 .profile-followers {
   /* background-color: aqua; */
-  margin: 10px 0 20px 0;
+  margin: 10px 0 10px 0;
 }
 
 .profile-followers span {
@@ -66,4 +75,21 @@
 
 .profile-content-tab.selected {
   border-bottom: 2px solid black;
+}
+
+.profile-options {
+  font-size: 1.4em;
+  cursor: pointer;
+
+  color: #929292;
+
+  padding: 7px;
+  border-radius: 50%;
+
+  transition: 0.1s ease;
+
+  position: relative;
+  top: 3px;
+
+  margin-left: 5px;
 }

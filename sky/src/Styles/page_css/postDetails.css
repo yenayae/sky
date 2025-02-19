@@ -93,37 +93,6 @@
   margin-right: 5px;
 }
 
-.options-menu {
-  /* background-color: rgb(253, 253, 253); */
-
-  border: 1px solid #f0f0f0;
-  background-color: white;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-
-  padding: 5px 5px;
-
-  margin-bottom: 10px;
-
-  position: absolute;
-  bottom: 100px;
-}
-
-.options-item {
-  width: 120px;
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 10px;
-
-  font-size: 0.9em;
-  font-weight: 500;
-}
-
-.options-item:hover {
-  background-color: #e2e2e2;
-}
-
 .post-heart.postDetails-heart,
 .post-options {
   font-size: 1.3em;

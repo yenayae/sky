@@ -13,8 +13,11 @@ import "../Styles/page_css/postDetails.css";
 import { ImageCarousel } from "../Components/ImageCarousel";
 
 import useLike from "../Hooks/useLike";
+import { useAuth } from "../Hooks/authContext";
 
 const PostDetails = () => {
+  const { user } = useAuth();
+
   useEffect(() => {
     document.title = "Post Details";
   }, []);
@@ -32,7 +35,6 @@ const PostDetails = () => {
   const body = postDetails.body;
 
   //check if liked by getting current userID
-  let CURRENT_USER = "0";
   const [isLiked, handleLikeToggle, isProcessing] = useLike(postID);
   const [likes, setLikes] = useState(postDetails.likes);
   const [isLikedUI, setIsLikedUI] = useState(isLiked);
@@ -42,11 +44,6 @@ const PostDetails = () => {
   }, [isLiked]);
 
   //check editing perms
-  let isPostOwner = false;
-  let postUserID = postDetails.user_id;
-  if (CURRENT_USER === postUserID) {
-    isPostOwner = true;
-  }
 
   //options menu functions
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
@@ -115,7 +112,7 @@ const PostDetails = () => {
                     alt="profile picture"
                   />
 
-                  <span className="username">username</span>
+                  <span className="username">{postDetails.users.username}</span>
                 </div>
 
                 <div className="post-caption">
@@ -131,10 +128,19 @@ const PostDetails = () => {
               <div className="items-container">
                 {showOptionsMenu && (
                   <OptionsMenu
-                    handleDelete={handleDelete}
-                    handleEdit={handleEdit}
-                    handleReport={handleReport}
-                    handleDownload={handleDownload}
+                    className="post-options-menu"
+                    showOptionsMenu={showOptionsMenu} // Toggle menu visibility
+                    options={[
+                      { label: "Download image", action: handleDownload },
+                      { label: "Report post", action: handleReport },
+                      ...(user?.id === postDetails.user_id
+                        ? [
+                            { label: "Edit post", action: handleEdit },
+                            { label: "Delete post", action: handleDelete },
+                          ]
+                        : []),
+                    ]}
+                    pageContext={"post-details"}
                   />
                 )}
 
@@ -177,19 +183,6 @@ const PostDetails = () => {
               </div>
             </div>
           </div>
-
-          {isPostOwner ? (
-            <Link to={`/editPost/${postID}`}>
-              <button
-                style={{
-                  marginRight: "10px",
-                }}
-                className="contact-button"
-              >
-                edit post
-              </button>
-            </Link>
-          ) : null}
         </div>
       </div>
     </div>

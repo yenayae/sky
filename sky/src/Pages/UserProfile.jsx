@@ -1,12 +1,15 @@
 import { useAuth } from "../Hooks/authContext";
 import { useLoaderData, useNavigate, useParams } from "react-router";
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGear } from "@fortawesome/free-solid-svg-icons";
 
 import { supabase } from "../supabase/supabaseClient";
 
 import Logout from "../Components/LogOut";
 import NavBar from "../Components/NavBar";
 import { DisplayPosts } from "../Components/DisplayPosts";
+import OptionsMenu from "../Components/OptionsMenu";
 
 import "../Styles/page_css/userProfilePage.css";
 
@@ -19,6 +22,7 @@ export default function UserProfile() {
 
   const [contentTabSelected, setContentTabSelected] = useState("posts");
   const [likedPosts, setLikedPosts] = useState([]);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
 
   const followers = userInfo.followers;
   const following = userInfo.following;
@@ -86,6 +90,19 @@ export default function UserProfile() {
     fetchLikedPosts();
   };
 
+  const handleOptionsClick = () => {
+    setShowOptionsMenu(!showOptionsMenu);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
+
+  const handleReportProfile = () => {
+    console.log("report profile!");
+  };
+
   console.log(userInfo);
 
   return (
@@ -96,8 +113,27 @@ export default function UserProfile() {
           <div className="profile-user-info">
             <img className="profile-image" src="/img/assets/kiry.png" alt="" />
             <div className="profile-user-details">
-              <div>
+              <div className="username-container">
                 <h1 className="profile-username">{userInfo.username}</h1>
+                <OptionsMenu
+                  showOptionsMenu={showOptionsMenu} // Toggle menu visibility
+                  options={[
+                    { label: "Report Profile", action: handleReportProfile },
+                    { label: "Log out", action: handleLogout },
+                  ]}
+                  pageContext="profile"
+                />
+                <FontAwesomeIcon
+                  className="profile-options"
+                  icon={faGear}
+                  onClick={handleOptionsClick}
+                  style={{
+                    backgroundColor: showOptionsMenu
+                      ? "rgb(182, 182, 182)"
+                      : "transparent",
+                    color: showOptionsMenu ? "white" : "#929292",
+                  }}
+                />
               </div>
               <div className="profile-followers">
                 <span>{followers} followers</span>
@@ -105,7 +141,8 @@ export default function UserProfile() {
               </div>
             </div>
           </div>
-          <Logout />
+
+          {/* <Logout /> */}
         </div>
 
         <div className="profile-content-container">
