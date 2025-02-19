@@ -30,11 +30,16 @@ const PostDetails = () => {
   });
   const title = postDetails.title;
   const body = postDetails.body;
-  const likes = postDetails.likes;
 
   //check if liked by getting current userID
   let CURRENT_USER = "0";
-  const [isLiked, handleLikeToggle] = useLike(postID);
+  const [isLiked, handleLikeToggle, isProcessing] = useLike(postID);
+  const [likes, setLikes] = useState(postDetails.likes);
+  const [isLikedUI, setIsLikedUI] = useState(isLiked);
+
+  useEffect(() => {
+    setIsLikedUI(isLiked);
+  }, [isLiked]);
 
   //check editing perms
   let isPostOwner = false;
@@ -64,6 +69,21 @@ const PostDetails = () => {
 
   const handleReport = () => {
     console.log("report post!");
+  };
+
+  const handleLike = () => {
+    if (isProcessing) return;
+
+    // optimistically update ui
+    setIsLikedUI((prev) => !prev);
+    setLikes((prevLikes) => (isLikedUI ? prevLikes - 1 : prevLikes + 1));
+
+    // call async handler
+    handleLikeToggle().catch((error) => {
+      console.error(error);
+      setIsLikedUI(isLiked);
+      setLikes((prevLikes) => (isLiked ? prevLikes + 1 : prevLikes - 1));
+    });
   };
 
   return (
@@ -126,9 +146,9 @@ const PostDetails = () => {
                     <FontAwesomeIcon
                       className="post-heart postDetails-heart"
                       icon={faHeart}
-                      color={isLiked ? "#d94e72" : "#cccccc"}
+                      color={isLikedUI ? "#d94e72" : "#cccccc"}
                       // size="2x"
-                      onClick={handleLikeToggle}
+                      onClick={handleLike}
                     />
 
                     <FontAwesomeIcon

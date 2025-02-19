@@ -80,7 +80,7 @@ const router = createBrowserRouter([
     loader: async ({ params }) => {
       const { data, error } = await supabase
         .from("users")
-        .select("*")
+        .select("*, posts(*, posts_images(image_url))")
         .eq("username", params.username)
         .single();
 

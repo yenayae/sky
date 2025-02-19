@@ -2,6 +2,12 @@ import { useState, useEffect, useRef, useTransition } from "react";
 import { useNavigate } from "react-router-dom";
 import { convertBlobUrlToFile } from "../lib/utils";
 import DOMPurify from "dompurify";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faXmark,
+  faTriangleExclamation,
+} from "@fortawesome/free-solid-svg-icons";
+import "../Styles/page_css/CreatePostPage.css";
 
 import { supabase } from "../supabase/supabaseClient";
 import { uploadImage } from "../supabase/storageUpload";
@@ -11,17 +17,14 @@ import { SelectedCosmeticTagDisplay } from "../Components/SelectedCosmeticTagDis
 import { CosmeticsTagSearch } from "../Components/CosmeticsTagSearch";
 import { ImageCarousel } from "../Components/ImageCarousel";
 import { ErrorSpan } from "../Components/ErrorSpan";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faXmark,
-  faTriangleExclamation,
-} from "@fortawesome/free-solid-svg-icons";
-import "../Styles/page_css/CreatePostPage.css";
+import { useAuth } from "../Hooks/authContext";
 
 export default function CreatePost() {
   useEffect(() => {
     document.title = "Create Post";
   }, []);
+
+  const { user } = useAuth();
 
   const TITLE_CHARACTER_LIMIT = 50;
 
@@ -234,7 +237,7 @@ export default function CreatePost() {
       // Insert post
       const { data: postData, error: postError } = await supabase
         .from("posts")
-        .insert([{ user_id: 0, title, body, likes: 0 }])
+        .insert([{ user_id: user.id, title, body, likes: 0 }])
         .select(); // Ensure we get back the inserted data
 
       if (postError) {

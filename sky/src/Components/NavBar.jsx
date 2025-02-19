@@ -41,8 +41,6 @@ export default function NavBar({ page, cosmeticPageReset, onSearch }) {
   const { user } = useAuth();
 
   const [currentUser, setCurrentUsername] = useState("");
-  console.log(user);
-
   useEffect(() => {
     const getUsername = async () => {
       if (!user) return; // Ensure user exists
