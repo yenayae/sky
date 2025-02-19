@@ -93,11 +93,6 @@ export default function NavBar({ page, cosmeticPageReset, onSearch }) {
             <FontAwesomeIcon icon={faHouse} />
           </button>
         </Link>
-        <Link to="/blog" style={{ height: "100%" }}>
-          <button className="nav-button" data-testid="community-button">
-            Community
-          </button>
-        </Link>
         <button
           className="nav-button"
           onClick={handleCosmeticsClick}
@@ -105,6 +100,13 @@ export default function NavBar({ page, cosmeticPageReset, onSearch }) {
         >
           Cosmetics
         </button>
+
+        <Link to="/blog" style={{ height: "100%" }}>
+          <button className="nav-button" data-testid="community-button">
+            Community
+          </button>
+        </Link>
+
         <SearchForm className="search-form" onSubmit={handleSearch}>
           <SearchInput
             className="search-bar"

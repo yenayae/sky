@@ -1,4 +1,3 @@
-import styled from "styled-components";
 import { Link, useLoaderData } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 
@@ -6,20 +5,6 @@ import NavBar from "../Components/NavBar";
 import { DisplayPosts } from "../Components/DisplayPosts";
 
 import "../Styles/styles.css";
-
-const Container = styled.div`
-  height: 100vh;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-`;
-
-const Column = styled.div`
-  height: 100%;
-  min-width: 200px;
-  margin: 5px;
-`;
 
 const Community = () => {
   useState(() => {

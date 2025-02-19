@@ -82,6 +82,7 @@ const router = createBrowserRouter([
         .from("users")
         .select("*, posts(*, posts_images(image_url))")
         .eq("username", params.username)
+        .order("created_at", { referencedTable: "posts", ascending: false })
         .single();
 
       if (error) {

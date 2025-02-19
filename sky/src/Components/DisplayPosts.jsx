@@ -2,9 +2,10 @@ import styled from "styled-components";
 import { useState, useEffect } from "react";
 
 import UserPost from "./UserPost";
+import "../Styles/components/displayPosts.css";
 
 const Container = styled.div`
-  height: 100vh;
+  height: auto;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -68,13 +69,24 @@ export const DisplayPosts = ({ posts }) => {
 
   return (
     <Container>
-      {columns.map((columnPosts, colIndex) => (
-        <Column key={colIndex}>
-          {columnPosts.map((post) => (
-            <UserPost key={post.id} postInfo={post} />
-          ))}
-        </Column>
-      ))}
+      {posts.length === 0 ? (
+        <div className="empty-posts">
+          <img
+            className="empty-posts-image"
+            src="/img/assets/lantern_pin.jpg"
+            alt=""
+          />
+          <span>nothing to see here yet...</span>
+        </div>
+      ) : (
+        columns.map((columnPosts, colIndex) => (
+          <Column key={colIndex}>
+            {columnPosts.map((post) => (
+              <UserPost key={post.id} postInfo={post} />
+            ))}
+          </Column>
+        ))
+      )}
     </Container>
   );
 };

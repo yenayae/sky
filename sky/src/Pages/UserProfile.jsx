@@ -1,6 +1,8 @@
 import { useAuth } from "../Hooks/authContext";
-import { useLoaderData, useNavigate } from "react-router";
-import { useState } from "react";
+import { useLoaderData, useNavigate, useParams } from "react-router";
+import { useState, useEffect } from "react";
+
+import { supabase } from "../supabase/supabaseClient";
 
 import Logout from "../Components/LogOut";
 import NavBar from "../Components/NavBar";
@@ -10,17 +12,69 @@ import "../Styles/page_css/userProfilePage.css";
 
 export default function UserProfile() {
   const userInfo = useLoaderData();
+  const { username } = useParams();
 
   const { user } = useAuth();
   const navigate = useNavigate();
 
   const [contentTabSelected, setContentTabSelected] = useState("posts");
-  const [posts, setPosts] = useState([]);
+  const [likedPosts, setLikedPosts] = useState([]);
 
-  if (!user) {
-    navigate("/login");
-    return null;
-  }
+  const followers = userInfo.followers;
+  const following = userInfo.following;
+
+  useEffect(() => {
+    if (user === undefined) return; // Ensure we don't trigger unnecessary renders
+    if (!user) navigate("/login");
+  }, [user, navigate]);
+
+  const fetchLikedPosts = async () => {
+    console.log("liked posts");
+    const { data, error } = await supabase
+      .from("users")
+      .select(
+        `
+      id,
+      liked_posts (
+        post_id,
+        created_at,
+        posts (
+          *,
+          posts_images(image_url)
+        )
+      )
+    `
+      )
+      .eq("username", username)
+      .order("created_at", { referencedTable: "liked_posts", ascending: false }) // Sort liked_posts by latest
+      .single();
+    if (error) {
+      console.error("Error fetching lked posts:", error);
+    } else {
+      // setLikedPosts(data.posts);
+      console.log(data.liked_posts);
+      const likedPosts = data.liked_posts.map((post) => post.posts);
+      console.log(likedPosts);
+      setLikedPosts(likedPosts);
+    }
+  };
+
+  const fetchUserPosts = async () => {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*, posts(*, posts_images(image_url))")
+      .order("created_at", { referencedTable: "posts", ascending: false })
+      .eq("username", username);
+    if (error) {
+      console.error("Error fetching user posts:", error);
+    } else {
+      console.log(data);
+    }
+  };
+
+  useEffect(() => {
+    fetchLikedPosts();
+  }, []);
 
   console.log(userInfo);
 
@@ -33,11 +87,11 @@ export default function UserProfile() {
             <img className="profile-image" src="/img/assets/kiry.png" alt="" />
             <div className="profile-user-details">
               <div>
-                <h1 className="profile-username">{user.username}</h1>
+                <h1 className="profile-username">{userInfo.username}</h1>
               </div>
               <div className="profile-followers">
-                <span>NUM followers</span>
-                <span>NUM following</span>
+                <span>{followers} followers</span>
+                <span>{following} following</span>
               </div>
             </div>
           </div>
@@ -70,7 +124,11 @@ export default function UserProfile() {
                 <DisplayPosts posts={userInfo.posts} />
               </div>
             )}
-            {contentTabSelected === "likes" && <div> liked posts </div>}
+            {contentTabSelected === "likes" && (
+              <div>
+                <DisplayPosts posts={likedPosts} />
+              </div>
+            )}
           </div>
         </div>
       </div>
