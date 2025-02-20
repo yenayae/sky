@@ -6,12 +6,13 @@ import COLORS from "../Styles/theme";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faEllipsis } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import "../Styles/page_css/postDetails.css";
 
 import { ImageCarousel } from "../Components/ImageCarousel";
 
+import { supabase } from "../supabase/supabaseClient";
 import useLike from "../Hooks/useLike";
 import { useAuth } from "../Hooks/authContext";
 
@@ -23,6 +24,7 @@ const PostDetails = () => {
   }, []);
 
   const postDetails = useLoaderData();
+  const navigate = useNavigate();
 
   console.log(postDetails);
 
@@ -45,6 +47,10 @@ const PostDetails = () => {
 
   //check editing perms
 
+  //report
+  const [showReportForm, setShowReportForm] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+
   //options menu functions
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
   const toggleMenu = () => {
@@ -52,20 +58,73 @@ const PostDetails = () => {
     setShowOptionsMenu(!showOptionsMenu);
   };
 
-  const handleDelete = () => {
-    console.log("delete post!");
+  const handleDelete = async () => {
+    if (!user) {
+      console.error("User is not authenticated.");
+      return;
+    }
+
+    if (user.id !== postDetails.user_id) {
+      return;
+    }
+
+    const { error: deleteError } = await supabase
+      .from("posts")
+      .delete()
+      .eq("id", postID);
+
+    if (deleteError) {
+      console.error("Error deleting post:", deleteError);
+    } else {
+      console.log("Post deleted successfully");
+    }
+
+    navigate("/blog");
   };
 
   const handleEdit = () => {
     console.log("edit post!");
   };
 
-  const handleDownload = () => {
-    console.log("download image!");
+  const handleDownload = async () => {
+    if (!postDetails.posts_images.length) {
+      console.log("No images to download!");
+      return;
+    }
+
+    try {
+      const downloadPromises = postDetails.posts_images.map(
+        async (image, index) => {
+          const imageUrl = `https://epybsqrrtinvvbvqjnyt.supabase.co/${image.image_url}`;
+          const response = await fetch(imageUrl);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch image: ${imageUrl}`);
+          }
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+
+          // Create a temporary link element
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `image_${index + 1}.jpg`; // Naming the file
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          // Clean up
+          URL.revokeObjectURL(url);
+        }
+      );
+
+      await Promise.all(downloadPromises);
+      console.log("All images downloaded successfully!");
+    } catch (error) {
+      console.error("Error downloading images:", error);
+    }
   };
 
   const handleReport = () => {
-    console.log("report post!");
+    setShowReportForm(true); // Open the report form
   };
 
   const handleLike = () => {
@@ -86,6 +145,30 @@ const PostDetails = () => {
   return (
     <div>
       <NavBar></NavBar>
+
+      {showReportForm && (
+        <div
+          className="report-modal-overlay"
+          onClick={() => setShowReportForm(false)}
+        >
+          <div
+            className="report-modal-box"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2>Report Post</h2>
+            <textarea
+              placeholder="Why are you reporting this post?"
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+            ></textarea>
+            <button onClick={() => setShowReportForm(false)}>Cancel</button>
+            <button onClick={() => console.log("Reported:", reportReason)}>
+              Submit
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="post-details-container">
         <div className="post-details-box">
           <div className="post-container">
@@ -131,7 +214,7 @@ const PostDetails = () => {
                     className="post-options-menu"
                     showOptionsMenu={showOptionsMenu} // Toggle menu visibility
                     options={[
-                      { label: "Download image", action: handleDownload },
+                      { label: "Download image(s)", action: handleDownload },
                       { label: "Report post", action: handleReport },
                       ...(user?.id === postDetails.user_id
                         ? [
