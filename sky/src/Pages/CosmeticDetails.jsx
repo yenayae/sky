@@ -45,10 +45,10 @@ function extractName(name) {
 
 const CosmeticDetails = () => {
   const cosmeticInfo = useLoaderData();
-  const [cosmeticImages, setCosmeticImages] = useState([]);
   const [cosmeticTypes, setCosmeticTypes] = useState([]);
-  const [cosmeticType, setCosmeticType] = useState(null);
-  const [isLoadingImages, setIsLoadingImages] = useState(true);
+
+  const cosmeticImages = cosmeticInfo.cosmetic_images;
+  const cosmeticType = cosmeticInfo.cosmetic_types.name;
 
   const navigate = useNavigate();
 
@@ -57,56 +57,6 @@ const CosmeticDetails = () => {
   useState(() => {
     document.title = cosmeticName;
   }, []);
-
-  //load in cosmetic types
-  useEffect(() => {
-    const fetchCosmeticTypes = async () => {
-      const { data, error } = await supabase.from("cosmetic_types").select("*");
-      if (error) {
-        console.error("Error fetching cosmetic types:", error);
-      } else {
-        setCosmeticTypes(data);
-      }
-    };
-
-    fetchCosmeticTypes();
-  }, []);
-
-  //load in cosmetic images
-  useEffect(() => {
-    const fetchCosmeticImages = async () => {
-      if (!cosmeticTypes.length) return; // Ensure cosmeticTypes is loaded
-
-      setIsLoadingImages(true);
-      try {
-        const { data: cosmetic_images, error } = await supabase
-          .from("cosmetic_images")
-          .select("id, image_url, alt_caption")
-          .eq("cosmetic_id", cosmeticInfo.id);
-
-        if (error) {
-          throw error;
-        }
-
-        setCosmeticImages(cosmetic_images);
-        let type = cosmeticTypes.find(
-          (type) => type.id === cosmeticInfo.type_id
-        ).name;
-        if (type.includes("props")) {
-          type = "props";
-        }
-
-        setCosmeticType(type);
-        setIsLoadingImages(false);
-      } catch (error) {
-        console.error("Error fetching cosmetic images:", error);
-      }
-    };
-
-    if (cosmeticInfo?.id) {
-      fetchCosmeticImages();
-    }
-  }, [cosmeticInfo.id, cosmeticInfo.type_id, cosmeticTypes]);
 
   //for navbar search redirect
   const handleSearchRedirect = (searchTerm) => {
@@ -127,7 +77,6 @@ const CosmeticDetails = () => {
           <ImageCarousel
             items={cosmeticImages}
             cosmeticType={cosmeticType}
-            loadState={isLoadingImages}
             pageContext={"cosmeticDetails"}
           />
 

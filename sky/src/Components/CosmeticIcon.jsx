@@ -58,28 +58,19 @@ const Tooltip = styled.div`
 `;
 
 const Wrapper = styled.div`
-  position: relative; /* Ensure tooltip is positioned relative to this container */
+  position: relative;
   display: inline-block;
 `;
 
-export default function CosmeticIcon({ cosmetic, cosmeticTypes, index }) {
-  const [cosmeticPath, setCosmeticPath] = useState("");
+export default function CosmeticIcon({ cosmetic, index }) {
   const [loading, setLoading] = useState(true);
   const [showTooltip, setShowTooltip] = useState(false);
 
-  useEffect(() => {
-    const findCosmeticType = () => {
-      const type = cosmeticTypes.find((type) => type.id === cosmetic.type_id);
-      if (type) {
-        let category = type.name.includes("props") ? "props" : type.name;
-        setCosmeticPath(`/img/cosmetics/${category}_icons/${cosmetic.icon}`);
-      }
-    };
-
-    if (cosmeticTypes.length > 0) {
-      findCosmeticType();
-    }
-  }, [cosmetic.type_id, cosmetic.icon, cosmeticTypes]);
+  let cosmeticType = cosmetic.cosmetic_types.name;
+  if (cosmeticType.includes("props")) {
+    cosmeticType = "props";
+  }
+  const iconPath = `/img/cosmetics/${cosmeticType}_icons/${cosmetic.icon}`;
 
   const handleImageLoad = () => {
     setLoading(false);
@@ -92,7 +83,7 @@ export default function CosmeticIcon({ cosmetic, cosmeticTypes, index }) {
     >
       <Link to={`/cosmetics/${cosmetic.id}`}>
         <Icon
-          src={cosmeticPath}
+          src={iconPath}
           alt={cosmetic.name}
           loading={loading}
           onLoad={handleImageLoad}

@@ -66,7 +66,7 @@ const Cosmetics = () => {
           .select(
             `
             *,
-            cosmetic_types(id, parent_type)
+            cosmetic_types(*)
           `
           )
           .ilike("name", `%${urlQuery.trim()}%`);
@@ -123,7 +123,7 @@ const Cosmetics = () => {
       let query = supabase.from("cosmetics").select(
         `
         *,
-        cosmetic_types(id, parent_type)
+        cosmetic_types(*)
       `
       );
 
@@ -155,6 +155,7 @@ const Cosmetics = () => {
           props: [10, 11, 12],
         };
         const typeIds = categoryToTypeIds[selectedCategory.toLowerCase()] || [];
+        console.log("typeIds", typeIds);
 
         if (typeIds.length > 0) {
           query = query.in("type_id", typeIds);

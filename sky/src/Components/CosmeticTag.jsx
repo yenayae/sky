@@ -3,7 +3,14 @@ import useFormatName from "../Hooks/formatName";
 
 export const CosmeticTag = ({ icon, display, name, type, onClick }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  if (type.includes("props")) {
+    type = "props";
+  }
+
   const iconUrl = `/img/cosmetics/${type}_icons/${icon}`;
+
+  console.log(iconUrl);
   const displayUrl = `/img/cosmetics/${type}_view/${display}`;
   const formattedName = useFormatName(name);
 

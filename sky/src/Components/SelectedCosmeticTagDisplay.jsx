@@ -24,7 +24,15 @@ export const SelectedCosmeticTagDisplay = ({
           <div className="tag-display-tag" key={cosmetic.id}>
             <img
               className="tag-display-icon"
-              src={`/img/cosmetics/${cosmetic.typeName}_icons/${cosmetic.icon}`}
+              src={`/img/cosmetics/${
+                [
+                  "held_props",
+                  "placeable_props",
+                  "large_placeable_props",
+                ].includes(cosmetic.typeName)
+                  ? "props_icons"
+                  : cosmetic.typeName + "_icons"
+              }/${cosmetic.icon}`}
               alt={cosmetic.name}
             />
             <FontAwesomeIcon

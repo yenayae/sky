@@ -18,6 +18,8 @@ import UserProfile from "./Pages/UserProfile";
 import EditPost from "./Pages/EditPost";
 import LikedPosts from "./Pages/LikedPosts";
 
+import OutfitShrine from "./Pages/OutfitShrine";
+
 import { AuthProvider } from "./Hooks/authContext";
 
 const cosmeticsLoader = async () => {
@@ -26,7 +28,7 @@ const cosmeticsLoader = async () => {
     .select(
       `
       *,
-      cosmetic_types(id, parent_type)
+      cosmetic_types(*)
     `
     )
     .limit(150);
@@ -97,19 +99,24 @@ const router = createBrowserRouter([
     path: "/passwordReset",
     element: <Signup />,
   },
-
   {
     path: "/cosmetics",
-    element: <Cosmetics />,
-    loader: cosmeticsLoader,
+    element: <OutfitShrine />,
   },
+
   {
     path: "/cosmetics/:id",
     element: <CosmeticDetails />,
     loader: async ({ params }) => {
       const { data, error } = await supabase
         .from("cosmetics")
-        .select("*")
+        .select(
+          `
+          *,
+          cosmetic_types(*),
+          cosmetic_images(image_url)
+        `
+        )
         .eq("id", params.id)
         .single();
 
@@ -120,6 +127,7 @@ const router = createBrowserRouter([
       return data;
     },
   },
+
   {
     path: "/blog",
     element: <Community />,

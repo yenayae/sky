@@ -31,6 +31,7 @@ export default function CreatePost() {
   const [imageUrls, setImageUrls] = useState([]);
   const [selectedCosmeticTags, setSelectedCosmeticTags] = useState([]);
   const [titleCharacterCount, setTitleCharacterCount] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   //error handling variables
   const [titleError, setTitleError] = useState("");
@@ -85,11 +86,6 @@ export default function CreatePost() {
   /* validation functions start */
   const validateTitle = (title) => {
     title = sanitizeInput(title);
-
-    if (!title.trim()) {
-      setTitleError("Title cannot be empty");
-      return false;
-    }
 
     if (title.length > TITLE_CHARACTER_LIMIT) {
       setTitleError(
@@ -201,10 +197,16 @@ export default function CreatePost() {
 
   //submit function
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     const title = document.querySelector(".title-container input").value;
     const body = document.querySelector(".body-container textarea").value;
 
-    if (!validateTitle(title) || !validateBody(body)) return;
+    if (!validateTitle(title) || !validateBody(body)) {
+      setIsSubmitting(false);
+      return;
+    }
 
     console.log("Uploading...");
 
@@ -242,12 +244,14 @@ export default function CreatePost() {
 
       if (postError) {
         console.error("Error inserting post:", postError);
+        setIsSubmitting(false);
         return;
       }
 
       const post_id = postData?.[0]?.id;
       if (!post_id) {
         console.error("Failed to retrieve post ID.");
+        setIsSubmitting(false);
         return;
       }
 
@@ -283,6 +287,7 @@ export default function CreatePost() {
       console.log("Post uploaded successfully:", postData);
 
       setSelectedCosmeticTags([]);
+      setIsSubmitting(false);
 
       //direct to blog page
       navigate("/blog");
