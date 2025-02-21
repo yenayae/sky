@@ -1,12 +1,17 @@
 import { useLoaderData, useNavigate } from "react-router";
-import NavBar from "../Components/NavBar";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+
+import NavBar from "../Components/NavBar";
 import CosmeticIcon from "../Components/CosmeticIcon";
-import { supabase } from "../supabase/supabaseClient";
 import { ImageCarousel } from "../Components/ImageCarousel";
+import { DisplayPosts } from "../Components/DisplayPosts";
+
+import { supabase } from "../supabase/supabaseClient";
 import useFormatName from "../Hooks/formatName";
 import useFormatPrice from "../Hooks/formatPrice";
+
+import "../Styles/page_css/cosmeticDetails.css";
 
 const Details = styled.div`
   display: flex;
@@ -45,12 +50,43 @@ function extractName(name) {
 
 const CosmeticDetails = () => {
   const cosmeticInfo = useLoaderData();
-  const [cosmeticTypes, setCosmeticTypes] = useState([]);
+  const navigate = useNavigate();
 
   const cosmeticImages = cosmeticInfo.cosmetic_images;
   const cosmeticType = cosmeticInfo.cosmetic_types.name;
 
-  const navigate = useNavigate();
+  const [cosmeticPosts, setCosmeticPosts] = useState([]);
+  const [fetchingPosts, setFetchingPosts] = useState(true);
+
+  //any user posts with cosmetic tag
+  useEffect(() => {
+    const fetchCosmeticPosts = async () => {
+      setFetchingPosts(true);
+      const { data, error } = await supabase
+        .from("posts_cosmetic_tags")
+        .select(
+          `
+          *,
+          posts(*, posts_images(image_url))
+        `
+        )
+        .eq("cosmetic_id", cosmeticInfo.id)
+        .limit(5);
+
+      if (error) {
+        throw new Error("Error fetching posts: " + error.message);
+      }
+
+      console.log(data);
+
+      const posts = data.map((entry) => entry.posts).flat();
+      console.log(posts);
+      setCosmeticPosts(posts);
+      setFetchingPosts(false);
+    };
+
+    fetchCosmeticPosts();
+  }, []);
 
   //set tab name to cosmetic name
   const cosmeticName = extractName(cosmeticInfo.name);
@@ -88,7 +124,6 @@ const CosmeticDetails = () => {
               <CosmeticIcon
                 key={cosmeticInfo.id}
                 cosmetic={cosmeticInfo}
-                cosmeticTypes={cosmeticTypes}
                 index={10}
               ></CosmeticIcon>
               <p>
@@ -99,6 +134,13 @@ const CosmeticDetails = () => {
           </DetailsBox>
         </Details>
       </div>
+
+      {cosmeticPosts.length > 0 && (
+        <div className="relevant-posts">
+          <h2 className="relevant-posts-header">From Sky Kids</h2>
+          <DisplayPosts posts={cosmeticPosts} loading={fetchingPosts} />
+        </div>
+      )}
     </div>
   );
 };

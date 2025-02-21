@@ -27,6 +27,8 @@ const Community = () => {
     setSearchResults(filtered);
   };
 
+  console.log(searchResults);
+
   return (
     <div>
       <NavBar page={"communityPage"} onSearch={handleSearch}></NavBar>

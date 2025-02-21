@@ -46,7 +46,6 @@ const OutfitShrine = () => {
     if (loading) return;
 
     setLoading(true);
-    console.log(searchQuery);
 
     let query = supabase.from("cosmetics").select(
       `
@@ -163,7 +162,6 @@ const OutfitShrine = () => {
 
     // get the type IDs for the selected category
     const typeIds = categoryToTypeIds[category] || [];
-    console.log("Category Type IDs:", typeIds);
 
     if (typeIds.length === 0) {
       console.warn("No matching type IDs found for category:", category);
@@ -188,8 +186,6 @@ const OutfitShrine = () => {
       (type) => type.name === subCategoryName
     );
 
-    console.log(subCategory);
-
     if (!subCategory) {
       console.error("Subcategory not found");
       setSearchResults([]);
@@ -201,9 +197,7 @@ const OutfitShrine = () => {
   };
 
   const loadMoreCosmetics = async () => {
-    console.log("called");
     if (loading || allLoaded) return;
-    console.log("passed");
 
     setPage((prev) => prev + 1);
 
@@ -252,10 +246,7 @@ const OutfitShrine = () => {
       const isVisible =
         bounding.top < window.innerHeight && bounding.bottom >= 0;
 
-      console.log("isVisible", isVisible);
-
       if (isVisible && Date.now() - lastLoadedTime >= 100) {
-        console.log("loading more...");
         lastLoadedTime = Date.now();
         loadMoreCosmetics();
       }

@@ -18,7 +18,7 @@ const Column = styled.div`
   margin: 5px;
 `;
 
-export const DisplayPosts = ({ posts }) => {
+export const DisplayPosts = ({ posts, loading = false }) => {
   // Constants for resize function
   const RESIZE_TIMEOUT = 200;
   const COLUMN_DIVISION = 220;
@@ -69,7 +69,7 @@ export const DisplayPosts = ({ posts }) => {
 
   return (
     <Container>
-      {posts.length === 0 ? (
+      {posts.length === 0 && !loading ? (
         <div className="empty-posts">
           <img
             className="empty-posts-image"
