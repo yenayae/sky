@@ -6,39 +6,13 @@ import NavBar from "../Components/NavBar";
 import CosmeticIcon from "../Components/CosmeticIcon";
 import { ImageCarousel } from "../Components/ImageCarousel";
 import { DisplayPosts } from "../Components/DisplayPosts";
+import StarDivider from "../Components/StarDivider";
 
 import { supabase } from "../supabase/supabaseClient";
 import useFormatName from "../Hooks/formatName";
 import useFormatPrice from "../Hooks/formatPrice";
 
 import "../Styles/page_css/cosmeticDetails.css";
-
-const Details = styled.div`
-  display: flex;
-  flex-direction: row;
-  padding: 20px;
-  background-color: rgb(248, 248, 248);
-  border-radius: 10px;
-  justify-content: center;
-  width: 80%;
-`;
-
-const DetailsH1 = styled.h1`
-  margin: 0;
-  font-size: 2em;
-`;
-
-const DetailsTitle = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
-
-const DetailsBox = styled.div`
-  padding: 0 20px;
-  width: 60%;
-  // background-color: green;
-`;
 
 function extractName(name) {
   return name
@@ -109,17 +83,19 @@ const CosmeticDetails = () => {
           alignItems: "center",
         }}
       >
-        <Details>
+        <div className="cosmetic-details">
           <ImageCarousel
             items={cosmeticImages}
             cosmeticType={cosmeticType}
             pageContext={"cosmeticDetails"}
           />
 
-          <DetailsBox>
-            <DetailsTitle>
-              <DetailsH1>{useFormatName(cosmeticName)}</DetailsH1>
-            </DetailsTitle>
+          <div className="cosmetic-details-container">
+            <div className="cosmetic-details-header">
+              <h1 className="cosmetic-details-name">
+                {useFormatName(cosmeticName)}
+              </h1>
+            </div>
             <div>
               <CosmeticIcon
                 key={cosmeticInfo.id}
@@ -131,14 +107,16 @@ const CosmeticDetails = () => {
                 {useFormatPrice(cosmeticInfo.costNum, cosmeticInfo.costType)}
               </p>
             </div>
-          </DetailsBox>
-        </Details>
+          </div>
+        </div>
       </div>
 
       {cosmeticPosts.length > 0 && (
-        <div className="relevant-posts">
-          <h2 className="relevant-posts-header">From Sky Kids</h2>
-          <DisplayPosts posts={cosmeticPosts} loading={fetchingPosts} />
+        <div>
+          <StarDivider sectionName={"sky kids gallery"} />
+          <div className="relevant-posts">
+            <DisplayPosts posts={cosmeticPosts} loading={fetchingPosts} />
+          </div>
         </div>
       )}
     </div>

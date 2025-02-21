@@ -14,14 +14,14 @@ const Container = styled.div`
 
 const Column = styled.div`
   height: 100%;
-  min-width: 200px;
+  min-width: 300px;
   margin: 5px;
 `;
 
 export const DisplayPosts = ({ posts, loading = false }) => {
   // Constants for resize function
   const RESIZE_TIMEOUT = 200;
-  const COLUMN_DIVISION = 220;
+  const COLUMN_DIVISION = 320;
 
   // Store number of columns based on window size
   const [columns, setColumns] = useState([]);
