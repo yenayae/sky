@@ -127,6 +127,34 @@ const PostDetails = () => {
     setShowReportForm(true); // Open the report form
   };
 
+  const closeReport = () => {
+    setShowReportForm(false);
+    setReportReason("");
+  };
+
+  const submitReport = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    if (!reportReason.trim()) {
+      console.error("Report reason is empty.");
+      return;
+    }
+    const { error } = await supabase.from("post_reports").insert([
+      {
+        post_id: postID,
+        reported_by: user.id,
+        reason: reportReason,
+        status: "pending",
+        created_at: new Date(),
+      },
+    ]);
+
+    closeReport();
+  };
+
   const handleLike = () => {
     if (isProcessing) return;
 
@@ -161,10 +189,8 @@ const PostDetails = () => {
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value)}
             ></textarea>
-            <button onClick={() => setShowReportForm(false)}>Cancel</button>
-            <button onClick={() => console.log("Reported:", reportReason)}>
-              Submit
-            </button>
+            <button onClick={closeReport}>Cancel</button>
+            <button onClick={submitReport}>Submit</button>
           </div>
         </div>
       )}
