@@ -67,6 +67,26 @@ const router = createBrowserRouter([
   },
 
   {
+    path: "/editPost/:id",
+    element: <EditPost />,
+    loader: async ({ params }) => {
+      const { data, error } = await supabase
+        .from("posts")
+        .select(
+          "*, posts_images(image_url), users(username), posts_cosmetic_tags(cosmetics(*, cosmetic_types(name)))"
+        )
+        .eq("id", params.id)
+        .single();
+
+      if (error) {
+        throw new Response("Cosmetic not found", { status: 404 });
+      }
+
+      return data;
+    },
+  },
+
+  {
     path: "/login",
     element: <Login />,
   },

@@ -29,9 +29,9 @@ export const SelectedCosmeticTagDisplay = ({
                   "held_props",
                   "placeable_props",
                   "large_placeable_props",
-                ].includes(cosmetic.typeName)
+                ].includes(cosmetic.cosmetic_types.name)
                   ? "props_icons"
-                  : cosmetic.typeName + "_icons"
+                  : cosmetic.cosmetic_types.name + "_icons"
               }/${cosmetic.icon}`}
               alt={cosmetic.name}
             />

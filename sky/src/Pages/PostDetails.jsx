@@ -84,6 +84,7 @@ const PostDetails = () => {
 
   const handleEdit = () => {
     console.log("edit post!");
+    navigate(`/editPost/${postID}`);
   };
 
   const handleDownload = async () => {

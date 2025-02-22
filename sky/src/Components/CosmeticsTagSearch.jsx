@@ -32,8 +32,6 @@ export const CosmeticsTagSearch = ({ toggleFunction, onTagSelect }) => {
     // Extract first image URL and type name for each cosmetic
     const formattedData = data.map((cosmetic) => ({
       ...cosmetic,
-      display: cosmetic.cosmetic_images?.[0]?.image_url || "", // Get first image URL
-      typeName: cosmetic.cosmetic_types?.name || "Unknown", // Get type name
     }));
 
     setCosmeticTags(formattedData);
@@ -78,16 +76,21 @@ export const CosmeticsTagSearch = ({ toggleFunction, onTagSelect }) => {
             <div className="cts-column">
               {cosmeticTags
                 .filter((_, index) => index % 2 === 0)
-                .map((cosmetic) => (
-                  <CosmeticTag
-                    key={cosmetic.id}
-                    icon={cosmetic.icon}
-                    display={cosmetic.display}
-                    name={cosmetic.name}
-                    type={cosmetic.typeName}
-                    onClick={() => handleTagClick(cosmetic)}
-                  />
-                ))}
+                .map(
+                  (cosmetic) => (
+                    console.log(cosmetic.cosmetic_types.name),
+                    (
+                      <CosmeticTag
+                        key={cosmetic.id}
+                        icon={cosmetic.icon}
+                        display={cosmetic.cosmetic_images[0].image_url}
+                        name={cosmetic.name}
+                        type={cosmetic.cosmetic_types.name}
+                        onClick={() => handleTagClick(cosmetic)}
+                      />
+                    )
+                  )
+                )}
             </div>
 
             <div className="cts-column">
@@ -97,9 +100,9 @@ export const CosmeticsTagSearch = ({ toggleFunction, onTagSelect }) => {
                   <CosmeticTag
                     key={cosmetic.id}
                     icon={cosmetic.icon}
-                    display={cosmetic.display}
+                    display={cosmetic.cosmetic_images[0].image_url}
                     name={cosmetic.name}
-                    type={cosmetic.typeName}
+                    type={cosmetic.cosmetic_types.name}
                     onClick={() => handleTagClick(cosmetic)}
                   />
                 ))}
