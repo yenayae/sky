@@ -32,6 +32,8 @@ const CosmeticDetails = () => {
   const [cosmeticPosts, setCosmeticPosts] = useState([]);
   const [fetchingPosts, setFetchingPosts] = useState(true);
 
+  console.log(cosmeticImages);
+
   //any user posts with cosmetic tag
   useEffect(() => {
     const fetchCosmeticPosts = async () => {

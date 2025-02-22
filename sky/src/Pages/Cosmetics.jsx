@@ -315,12 +315,15 @@ const Cosmetics = () => {
 
   // filter results by category
   const handleCategorySelect = (category) => {
-    //clear url query
-    navigate(`/cosmetics`);
-    setSearchQuery("");
+    console.log("click category", category);
 
     //prevent reloading same categories
     if (searchState === "category" && selectedCategory === category) return;
+    console.log("not repeat?");
+
+    //clear url query
+    navigate(`/cosmetics`);
+    setSearchQuery("");
 
     //set search state to category and reset page + add permanent glow
     setSearchState("category");

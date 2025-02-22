@@ -134,12 +134,12 @@ const OutfitShrine = () => {
 
   // filter results by category
   const handleCategorySelect = (category) => {
+    // prevent reloading the same category
+    if (searchState === "category" && selectedCategory === category) return;
+
     // clear URL query
     navigate(ROUTE);
     setCosmetics([]);
-
-    // prevent reloading the same category
-    if (searchState === "category" && selectedCategory === category) return;
 
     // set search state to category and reset page + add permanent glow
     setSearchState("category");

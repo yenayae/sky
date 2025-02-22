@@ -173,12 +173,14 @@ const router = createBrowserRouter([
     loader: async ({ params }) => {
       const { data, error } = await supabase
         .from("posts")
-        .select("*, posts_images(image_url), users(username)")
+        .select(
+          "*, posts_images(image_url), users(username), posts_comments(*, users(username, pfp))"
+        )
         .eq("id", params.id)
         .single();
 
       if (error) {
-        throw new Response("Cosmetic not found", { status: 404 });
+        throw new Response("post not found", { status: 404 });
       }
 
       return data;

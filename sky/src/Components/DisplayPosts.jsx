@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import UserPost from "./UserPost";
 import "../Styles/components/displayPosts.css";
 
+const POST_SIZE = 300;
+
 const Container = styled.div`
   height: auto;
   display: flex;
@@ -14,7 +16,7 @@ const Container = styled.div`
 
 const Column = styled.div`
   height: 100%;
-  min-width: 300px;
+  min-width: ${POST_SIZE}px;
   margin: 5px;
 `;
 
@@ -82,7 +84,7 @@ export const DisplayPosts = ({ posts, loading = false }) => {
         columns.map((columnPosts, colIndex) => (
           <Column key={colIndex}>
             {columnPosts.map((post) => (
-              <UserPost key={post.id} postInfo={post} />
+              <UserPost key={post.id} postInfo={post} postWidth={POST_SIZE} />
             ))}
           </Column>
         ))

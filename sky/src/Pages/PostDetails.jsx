@@ -27,6 +27,7 @@ const PostDetails = () => {
   const navigate = useNavigate();
 
   console.log(postDetails);
+  console.log(postDetails.posts_comments);
 
   //post details metadata
   const postID = postDetails.id;
@@ -35,6 +36,25 @@ const PostDetails = () => {
   });
   const title = postDetails.title;
   const body = postDetails.body;
+
+  const CAROUSEL_WIDTH = 400;
+  const [firstImageHeight, setFirstImageHeight] = useState(null);
+  useEffect(() => {
+    console.log("check");
+    if (imagesArray.length > 0) {
+      const firstImg = new Image();
+      firstImg.src = imagesArray[0];
+      firstImg.onload = () => {
+        const aspectRatio = firstImg.height / firstImg.width;
+        const scaledHeight = CAROUSEL_WIDTH * aspectRatio;
+        setFirstImageHeight(scaledHeight);
+      };
+    }
+  }, [imagesArray]);
+
+  //comments
+  const [comment, setComment] = useState("");
+  const [comments, setComments] = useState(postDetails.posts_comments);
 
   //check if liked by getting current userID
   const [isLiked, handleLikeToggle, isProcessing] = useLike(postID);
@@ -171,6 +191,38 @@ const PostDetails = () => {
     });
   };
 
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      navigate("/login"); // Redirect to login if not authenticated
+      return;
+    }
+
+    if (!comment.trim()) return; // Prevent empty comments
+
+    const { data, error } = await supabase
+      .from("posts_comments")
+      .insert([
+        {
+          post_id: postID,
+          user_id: user.id,
+          content: comment,
+        },
+      ])
+      .select(
+        "id, content, post_id, user_id, created_at, users(pfp, username)"
+      );
+
+    if (error) {
+      console.error("Error adding comment:", error);
+    } else {
+      console.log(data);
+
+      setComments([...comments, ...data]);
+      setComment("");
+    }
+  };
+
   return (
     <div>
       <NavBar></NavBar>
@@ -209,11 +261,7 @@ const PostDetails = () => {
                 width: imagesArray.length > 0 ? "300px" : "550px",
               }}
             >
-              <div
-                style={{
-                  margin: "10px",
-                }}
-              >
+              <div className="content-details-box">
                 <h1 className="post-details-title">{postDetails.title}</h1>
                 <div className="post-details-user">
                   <img
@@ -233,6 +281,44 @@ const PostDetails = () => {
                   >
                     {body}
                   </p>
+                </div>
+                <hr />
+                <div
+                  className="comments-container"
+                  style={{
+                    maxHeight: firstImageHeight
+                      ? `${firstImageHeight - 210}px`
+                      : "auto",
+                    overflowY: "auto",
+                  }}
+                >
+                  {comments.map((comment) => (
+                    <div className="comment">
+                      <img
+                        className="post-details-pfp"
+                        src={
+                          comment.users.pfp
+                            ? comment.users.pfp
+                            : "/img/default_pfp.jpg"
+                        }
+                        alt=""
+                      />
+
+                      <div
+                        className="comment-content-wrapper"
+                        style={{
+                          maxWidth: imagesArray.length > 0 ? "80%" : "90%",
+                        }}
+                      >
+                        <span className="username">
+                          {comment.users.username}
+                        </span>
+                        <span className="comment-content">
+                          {comment.content}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
               <div className="items-container">
@@ -288,6 +374,13 @@ const PostDetails = () => {
                     style={{
                       width: imagesArray.length > 0 ? "258px" : "508px",
                     }}
+                    onChange={(e) => setComment(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleCommentSubmit(e);
+                      }
+                    }}
+                    value={comment}
                   />
                 </div>
               </div>

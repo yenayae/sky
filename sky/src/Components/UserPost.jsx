@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 import useLike from "../Hooks/useLike";
 
-export default function UserPost({ postInfo }) {
+export default function UserPost({ postInfo, postWidth }) {
   const imageLink =
     postInfo.posts_images.length > 0
       ? `https://epybsqrrtinvvbvqjnyt.supabase.co/${postInfo.posts_images[0].image_url}`
@@ -33,6 +33,9 @@ export default function UserPost({ postInfo }) {
               src={imageLink}
               alt={postInfo.image}
               onLoad={() => setImageLoaded(true)}
+              style={{
+                width: `${postWidth}px`,
+              }}
             />
           </Link>
           <div className="post-items">
@@ -59,9 +62,10 @@ export default function UserPost({ postInfo }) {
           style={{
             textAlign: "left",
             borderRadius: "10px",
-            width: "200px",
+            width: `${postWidth}px`,
             // border: "1px solid #e2e2e2",
             backgroundColor: "#eeebeb",
+            marginBottom: "15px",
           }}
           // className="post"
         >

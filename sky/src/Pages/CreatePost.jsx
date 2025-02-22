@@ -208,6 +208,12 @@ export default function CreatePost() {
       return;
     }
 
+    if (title.length === 0 && body.length === 0 && imageUrls.length === 0) {
+      console.log("No content to upload.");
+      setIsSubmitting(false);
+      return;
+    }
+
     console.log("Uploading...");
 
     let urls = [];

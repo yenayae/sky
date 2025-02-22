@@ -1,4 +1,8 @@
 export const CosmeticCarouselItem = ({ item, width, cosmeticType }) => {
+  if (cosmeticType.includes("props")) {
+    cosmeticType = "props";
+  }
+
   return (
     <div className="carousel-item" style={{ width: width }}>
       <div></div>

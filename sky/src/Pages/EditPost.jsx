@@ -336,7 +336,7 @@ export default function EditPost() {
                   className="post-upload-button"
                   disabled={isSubmitting}
                 >
-                  Upload
+                  Edit Post
                 </button>
               </div>
             </div>
