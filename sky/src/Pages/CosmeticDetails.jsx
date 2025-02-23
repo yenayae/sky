@@ -32,8 +32,6 @@ const CosmeticDetails = () => {
   const [cosmeticPosts, setCosmeticPosts] = useState([]);
   const [fetchingPosts, setFetchingPosts] = useState(true);
 
-  console.log(cosmeticImages);
-
   //any user posts with cosmetic tag
   useEffect(() => {
     const fetchCosmeticPosts = async () => {
@@ -46,8 +44,7 @@ const CosmeticDetails = () => {
           posts(*, posts_images(image_url))
         `
         )
-        .eq("cosmetic_id", cosmeticInfo.id)
-        .limit(5);
+        .eq("cosmetic_id", cosmeticInfo.id);
 
       if (error) {
         throw new Error("Error fetching posts: " + error.message);
@@ -56,7 +53,6 @@ const CosmeticDetails = () => {
       console.log(data);
 
       const posts = data.map((entry) => entry.posts).flat();
-      console.log(posts);
       setCosmeticPosts(posts);
       setFetchingPosts(false);
     };

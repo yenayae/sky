@@ -174,7 +174,7 @@ const router = createBrowserRouter([
       const { data, error } = await supabase
         .from("posts")
         .select(
-          "*, posts_images(image_url), users(username), posts_comments(*, users(username, pfp))"
+          "*, posts_images(image_url), users(username), posts_comments(*, users(username, pfp)), posts_cosmetic_tags(*)"
         )
         .eq("id", params.id)
         .single();

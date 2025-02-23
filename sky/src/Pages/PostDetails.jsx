@@ -12,13 +12,14 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 
-import "../Styles/page_css/postDetails.css";
-
 import { ImageCarousel } from "../Components/ImageCarousel";
+import { DisplayPosts } from "../Components/DisplayPosts";
 
 import { supabase } from "../supabase/supabaseClient";
 import useLike from "../Hooks/useLike";
 import { useAuth } from "../Hooks/authContext";
+
+import "../Styles/page_css/postDetails.css";
 
 const PostDetails = () => {
   const { user } = useAuth();
@@ -45,7 +46,6 @@ const PostDetails = () => {
   const CAROUSEL_WIDTH = 400;
   const [firstImageHeight, setFirstImageHeight] = useState(null);
   useEffect(() => {
-    console.log("check");
     if (imagesArray.length > 0) {
       const firstImg = new Image();
       firstImg.src = imagesArray[0];
@@ -70,7 +70,42 @@ const PostDetails = () => {
     setIsLikedUI(isLiked);
   }, [isLiked]);
 
-  //check editing perms
+  const [cosmeticPosts, setCosmeticPosts] = useState([]);
+  const [fetchingPosts, setFetchingPosts] = useState(true);
+
+  //fetch explore page posts (similarly tagged posts)
+  const cosmeticTagsIDs = postDetails.posts_cosmetic_tags
+    .map((tag) => tag.cosmetic_id)
+    .flat();
+
+  useEffect(() => {
+    const fetchCosmeticPosts = async () => {
+      setFetchingPosts(true);
+      const { data, error } = await supabase
+        .from("posts_cosmetic_tags")
+        .select(
+          `
+            *,
+            posts(*, posts_images(image_url))
+          `
+        )
+        .in("cosmetic_id", cosmeticTagsIDs);
+      if (error) {
+        throw new Error("Error fetching posts: " + error.message);
+      }
+
+      const posts = data
+        .map((entry) => entry.posts)
+        .flat()
+        .filter((post) => post.id !== postDetails.id);
+
+      console.log(posts);
+      setCosmeticPosts(posts);
+      setFetchingPosts(false);
+    };
+
+    fetchCosmeticPosts();
+  }, []);
 
   //report
   const [showReportForm, setShowReportForm] = useState(false);
@@ -79,7 +114,6 @@ const PostDetails = () => {
   //options menu functions
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
   const toggleMenu = () => {
-    console.log("toggle menu!");
     setShowOptionsMenu(!showOptionsMenu);
   };
 
@@ -108,13 +142,11 @@ const PostDetails = () => {
   };
 
   const handleEdit = () => {
-    console.log("edit post!");
     navigate(`/editPost/${postID}`);
   };
 
   const handleDownload = async () => {
     if (!postDetails.posts_images.length) {
-      console.log("No images to download!");
       return;
     }
 
@@ -221,8 +253,6 @@ const PostDetails = () => {
     if (error) {
       console.error("Error adding comment:", error);
     } else {
-      console.log(data);
-
       setComments([...comments, ...data]);
       setComment("");
     }
@@ -320,46 +350,40 @@ const PostDetails = () => {
                       overflowY: "auto",
                     }}
                   >
-                    {comments.map(
-                      (comment) => (
-                        console.log(comment),
-                        (
-                          <div className="comment">
-                            {(comment.user_id === user.id ||
-                              postDetails.user_id === user.id) && (
-                              <FontAwesomeIcon
-                                icon={faXmark}
-                                className="comment-x"
-                                onClick={() => removeComment(comment.id)}
-                              />
-                            )}
-                            <img
-                              className="post-details-pfp"
-                              src={
-                                comment.users.pfp
-                                  ? comment.users.pfp
-                                  : "/img/default_pfp.jpg"
-                              }
-                              alt="comment user profile"
-                            />
-                            <div
-                              className="comment-content-wrapper"
-                              style={{
-                                maxWidth:
-                                  imagesArray.length > 0 ? "75%" : "90%",
-                              }}
-                            >
-                              <span className="username">
-                                {comment.users.username}
-                              </span>
-                              <span className="comment-content">
-                                {comment.content}
-                              </span>
-                            </div>
-                          </div>
-                        )
-                      )
-                    )}
+                    {comments.map((comment) => (
+                      <div className="comment">
+                        {(comment.user_id === user.id ||
+                          postDetails.user_id === user.id) && (
+                          <FontAwesomeIcon
+                            icon={faXmark}
+                            className="comment-x"
+                            onClick={() => removeComment(comment.id)}
+                          />
+                        )}
+                        <img
+                          className="post-details-pfp"
+                          src={
+                            comment.users.pfp
+                              ? comment.users.pfp
+                              : "/img/default_pfp.jpg"
+                          }
+                          alt="comment user profile"
+                        />
+                        <div
+                          className="comment-content-wrapper"
+                          style={{
+                            maxWidth: imagesArray.length > 0 ? "75%" : "90%",
+                          }}
+                        >
+                          <span className="username">
+                            {comment.users.username}
+                          </span>
+                          <span className="comment-content">
+                            {comment.content}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -429,6 +453,14 @@ const PostDetails = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      <div style={{ marginTop: "10px" }}>
+        {cosmeticPosts.length > 0 ? (
+          <DisplayPosts posts={cosmeticPosts} />
+        ) : (
+          <div></div>
+        )}
       </div>
     </div>
   );
