@@ -5,7 +5,11 @@ import styled from "styled-components";
 import COLORS from "../Styles/theme";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart, faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHeart,
+  faEllipsis,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 
 import "../Styles/page_css/postDetails.css";
@@ -26,8 +30,9 @@ const PostDetails = () => {
   const postDetails = useLoaderData();
   const navigate = useNavigate();
 
-  console.log(postDetails);
-  console.log(postDetails.posts_comments);
+  if (!user) {
+    navigate("/login");
+  }
 
   //post details metadata
   const postID = postDetails.id;
@@ -223,6 +228,27 @@ const PostDetails = () => {
     }
   };
 
+  const removeComment = async (commentID) => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    // Delete comment from Supabase
+    const { error } = await supabase
+      .from("posts_comments")
+      .delete()
+      .eq("id", commentID);
+
+    if (error) {
+      console.error("Error removing comment:", error);
+      return;
+    }
+
+    // Update state to remove the comment
+    setComments(comments.filter((comment) => comment.id !== commentID));
+  };
+
   return (
     <div>
       <NavBar></NavBar>
@@ -282,43 +308,59 @@ const PostDetails = () => {
                     {body}
                   </p>
                 </div>
-                <hr />
-                <div
-                  className="comments-container"
-                  style={{
-                    maxHeight: firstImageHeight
-                      ? `${firstImageHeight - 210}px`
-                      : "auto",
-                    overflowY: "auto",
-                  }}
-                >
-                  {comments.map((comment) => (
-                    <div className="comment">
-                      <img
-                        className="post-details-pfp"
-                        src={
-                          comment.users.pfp
-                            ? comment.users.pfp
-                            : "/img/default_pfp.jpg"
-                        }
-                        alt=""
-                      />
+                <div>
+                  {comments.length > 0 && <hr />}
 
-                      <div
-                        className="comment-content-wrapper"
-                        style={{
-                          maxWidth: imagesArray.length > 0 ? "80%" : "90%",
-                        }}
-                      >
-                        <span className="username">
-                          {comment.users.username}
-                        </span>
-                        <span className="comment-content">
-                          {comment.content}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                  <div
+                    className="comments-container"
+                    style={{
+                      maxHeight: firstImageHeight
+                        ? `${firstImageHeight - 210}px`
+                        : "auto",
+                      overflowY: "auto",
+                    }}
+                  >
+                    {comments.map(
+                      (comment) => (
+                        console.log(comment),
+                        (
+                          <div className="comment">
+                            {(comment.user_id === user.id ||
+                              postDetails.user_id === user.id) && (
+                              <FontAwesomeIcon
+                                icon={faXmark}
+                                className="comment-x"
+                                onClick={() => removeComment(comment.id)}
+                              />
+                            )}
+                            <img
+                              className="post-details-pfp"
+                              src={
+                                comment.users.pfp
+                                  ? comment.users.pfp
+                                  : "/img/default_pfp.jpg"
+                              }
+                              alt="comment user profile"
+                            />
+                            <div
+                              className="comment-content-wrapper"
+                              style={{
+                                maxWidth:
+                                  imagesArray.length > 0 ? "75%" : "90%",
+                              }}
+                            >
+                              <span className="username">
+                                {comment.users.username}
+                              </span>
+                              <span className="comment-content">
+                                {comment.content}
+                              </span>
+                            </div>
+                          </div>
+                        )
+                      )
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="items-container">

@@ -192,10 +192,29 @@
   margin-bottom: 5px;
 
   word-wrap: break-word;
+
+  position: relative;
+}
+
+.comment-x {
+  color: rgb(148, 148, 148);
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  opacity: 0;
+  transition: 0.1s ease;
+}
+
+.comment-x:hover {
+  color: rgb(228, 33, 33);
 }
 
 .comment:hover {
   background-color: #e9e9e9;
+}
+
+.comment:hover .comment-x {
+  opacity: 1;
 }
 
 .comment-content-wrapper {
