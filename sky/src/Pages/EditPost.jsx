@@ -37,13 +37,13 @@ export default function EditPost() {
 
   //carry over post details
   const imagesArray = postDetails.posts_images.map((image) => {
-    return `https://epybsqrrtinvvbvqjnyt.supabase.co/${image.image_url}`;
+    return image.public_url;
   });
   const cosmeticTags = postDetails.posts_cosmetic_tags.flatMap(
     (item) => item.cosmetics
   );
 
-  console.log(postDetails);
+  console.log(cosmeticTags);
 
   const [imageUrls, setImageUrls] = useState([imagesArray]);
   const [title, setTitle] = useState(postDetails.title);

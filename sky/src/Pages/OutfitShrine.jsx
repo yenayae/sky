@@ -72,9 +72,22 @@ const OutfitShrine = () => {
     if (error) {
       console.error("Error fetching cosmetics:", error);
     } else {
+      // map over fetched cosmetics and update icon URLs
+      const updatedCosmetics = data.map((item) => {
+        const typeName = item.cosmetic_types?.name?.toLowerCase() || "unknown";
+        const folder = typeName.includes("props")
+          ? "props_icons"
+          : `${typeName}_icons`;
+        const publicUrl = supabase.storage
+          .from("cosmetic_images")
+          .getPublicUrl(`${folder}/${item.icon}`).data.publicUrl;
+
+        return { ...item, icon: publicUrl };
+      });
+
       // ensure no duplicates are added
       setCosmetics((prevCosmetics) => {
-        const newCosmetics = data.filter(
+        const newCosmetics = updatedCosmetics.filter(
           (item) => !prevCosmetics.some((prevItem) => prevItem.id === item.id)
         );
         return [...prevCosmetics, ...newCosmetics];
@@ -330,6 +343,8 @@ const OutfitShrine = () => {
                   ></SubCategoryButton>
                 ))}
           </div>
+
+          {console.log(cosmetics)}
 
           <div className="cosmetic-results-container">
             {cosmetics.length === 0 ? (

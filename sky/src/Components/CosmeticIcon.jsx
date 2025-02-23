@@ -70,7 +70,7 @@ export default function CosmeticIcon({ cosmetic, index }) {
   if (cosmeticType.includes("props")) {
     cosmeticType = "props";
   }
-  const iconPath = `/img/cosmetics/${cosmeticType}_icons/${cosmetic.icon}`;
+  const iconPath = cosmetic.icon;
 
   const handleImageLoad = () => {
     setLoading(false);

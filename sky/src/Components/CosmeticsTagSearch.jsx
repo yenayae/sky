@@ -12,14 +12,13 @@ export const CosmeticsTagSearch = ({ toggleFunction, onTagSelect }) => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    console.log("submitting");
     e.preventDefault();
     setLoading(true);
     const query = e.target.elements.searchInput.value.trim();
 
     const { data, error } = await supabase
       .from("cosmetics")
-      .select("*, cosmetic_images(image_url), cosmetic_types(name)") // Join both tables
+      .select("*, cosmetic_images(image_url), cosmetic_types(name)")
       .ilike("name", `%${query}%`)
       .limit(20);
 
@@ -29,21 +28,44 @@ export const CosmeticsTagSearch = ({ toggleFunction, onTagSelect }) => {
       return;
     }
 
-    // Extract first image URL and type name for each cosmetic
-    const formattedData = data.map((cosmetic) => ({
-      ...cosmetic,
-    }));
+    // Process each cosmetic to include public URLs
+    const formattedData = data.map((cosmetic) => {
+      const typeName =
+        cosmetic.cosmetic_types?.name?.toLowerCase() || "unknown";
+      const iconFolder = typeName.includes("props")
+        ? "props_icons"
+        : `${typeName}_icons`;
+      const viewFolder = typeName.includes("props")
+        ? "props_view"
+        : `${typeName}_view`;
+
+      // Generate public URL for the main icon
+      const iconPublicUrl = supabase.storage
+        .from("cosmetic_images")
+        .getPublicUrl(`${iconFolder}/${cosmetic.icon}`).data.publicUrl;
+
+      // Generate public URLs for each cosmetic image
+      const cosmeticImagesWithUrls = cosmetic.cosmetic_images.map((image) => ({
+        ...image,
+        public_url: supabase.storage
+          .from("cosmetic_images")
+          .getPublicUrl(`${viewFolder}/${image.image_url}`).data.publicUrl,
+      }));
+
+      return {
+        ...cosmetic,
+        icon: iconPublicUrl,
+        cosmetic_images: cosmeticImagesWithUrls,
+      };
+    });
 
     setCosmeticTags(formattedData);
     setLoading(false);
-    console.log(formattedData);
   };
 
   const handleTagClick = (cosmetic) => {
     onTagSelect(cosmetic);
     toggleFunction();
-
-    console.log("tag clicked", cosmetic);
   };
 
   return (
@@ -76,21 +98,13 @@ export const CosmeticsTagSearch = ({ toggleFunction, onTagSelect }) => {
             <div className="cts-column">
               {cosmeticTags
                 .filter((_, index) => index % 2 === 0)
-                .map(
-                  (cosmetic) => (
-                    console.log(cosmetic.cosmetic_types.name),
-                    (
-                      <CosmeticTag
-                        key={cosmetic.id}
-                        icon={cosmetic.icon}
-                        display={cosmetic.cosmetic_images[0].image_url}
-                        name={cosmetic.name}
-                        type={cosmetic.cosmetic_types.name}
-                        onClick={() => handleTagClick(cosmetic)}
-                      />
-                    )
-                  )
-                )}
+                .map((cosmetic) => (
+                  <CosmeticTag
+                    key={cosmetic.id}
+                    cosmetic={cosmetic}
+                    onClick={() => handleTagClick(cosmetic)}
+                  />
+                ))}
             </div>
 
             <div className="cts-column">
@@ -99,10 +113,7 @@ export const CosmeticsTagSearch = ({ toggleFunction, onTagSelect }) => {
                 .map((cosmetic) => (
                   <CosmeticTag
                     key={cosmetic.id}
-                    icon={cosmetic.icon}
-                    display={cosmetic.cosmetic_images[0].image_url}
-                    name={cosmetic.name}
-                    type={cosmetic.cosmetic_types.name}
+                    cosmetic={cosmetic}
                     onClick={() => handleTagClick(cosmetic)}
                   />
                 ))}

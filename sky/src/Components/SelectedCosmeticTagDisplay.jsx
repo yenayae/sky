@@ -17,6 +17,8 @@ export const SelectedCosmeticTagDisplay = ({
       .addEventListener("change", (e) => setIsDesktop(e.matches));
   }, []);
 
+  console.log(selectedCosmeticTags);
+
   return (
     <div className="tag-display-container">
       <div className={`tag-display-tags ${isDesktop ? "desktop" : "mobile"}`}>
@@ -24,15 +26,7 @@ export const SelectedCosmeticTagDisplay = ({
           <div className="tag-display-tag" key={cosmetic.id}>
             <img
               className="tag-display-icon"
-              src={`/img/cosmetics/${
-                [
-                  "held_props",
-                  "placeable_props",
-                  "large_placeable_props",
-                ].includes(cosmetic.cosmetic_types.name)
-                  ? "props_icons"
-                  : cosmetic.cosmetic_types.name + "_icons"
-              }/${cosmetic.icon}`}
+              src={cosmetic.icon}
               alt={cosmetic.name}
             />
             <FontAwesomeIcon

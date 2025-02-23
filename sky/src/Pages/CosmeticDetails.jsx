@@ -11,6 +11,7 @@ import StarDivider from "../Components/StarDivider";
 import { supabase } from "../supabase/supabaseClient";
 import useFormatName from "../Hooks/formatName";
 import useFormatPrice from "../Hooks/formatPrice";
+import useProcessPostImages from "../Hooks/useProcessPostImages";
 
 import "../Styles/page_css/cosmeticDetails.css";
 
@@ -25,12 +26,15 @@ function extractName(name) {
 const CosmeticDetails = () => {
   const cosmeticInfo = useLoaderData();
   const navigate = useNavigate();
+  const processPostImages = useProcessPostImages();
 
   const cosmeticImages = cosmeticInfo.cosmetic_images;
   const cosmeticType = cosmeticInfo.cosmetic_types.name;
 
   const [cosmeticPosts, setCosmeticPosts] = useState([]);
   const [fetchingPosts, setFetchingPosts] = useState(true);
+
+  console.log(cosmeticInfo);
 
   //any user posts with cosmetic tag
   useEffect(() => {
@@ -53,6 +57,8 @@ const CosmeticDetails = () => {
       console.log(data);
 
       const posts = data.map((entry) => entry.posts).flat();
+      processPostImages(posts);
+
       setCosmeticPosts(posts);
       setFetchingPosts(false);
     };

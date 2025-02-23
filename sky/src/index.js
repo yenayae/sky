@@ -7,7 +7,6 @@ import { supabase } from "./supabase/supabaseClient";
 import Community from "./Pages/Community";
 import Home from "./Pages/Home";
 import PostDetails from "./Pages/PostDetails";
-import Cosmetics from "./Pages/Cosmetics";
 import CosmeticDetails from "./Pages/CosmeticDetails";
 import ContactPage from "./Pages/ContactPage";
 import SubmissionPage from "./Pages/SubmissionPage";
@@ -86,14 +85,30 @@ const router = createBrowserRouter([
         throw new Response("Cosmetic not found", { status: 404 });
       }
 
+      // Process post images
       if (data.posts_images.length > 0) {
         data.posts_images = processPostImages([data])[0].posts_images;
       }
 
+      // Process cosmetic tags with proper folder structure
+      data.posts_cosmetic_tags = data.posts_cosmetic_tags.map((tag) => {
+        if (tag.cosmetics?.icon) {
+          const typeName =
+            tag.cosmetics.cosmetic_types?.name?.toLowerCase() || "unknown";
+          const folder = typeName.includes("props")
+            ? "props_icons"
+            : `${typeName}_icons`;
+
+          tag.cosmetics.icon = supabase.storage
+            .from("cosmetic_images")
+            .getPublicUrl(`${folder}/${tag.cosmetics.icon}`).data.publicUrl;
+        }
+        return tag;
+      });
+
       return data;
     },
   },
-
   {
     path: "/login",
     element: <Login />,
@@ -156,10 +171,35 @@ const router = createBrowserRouter([
         throw new Response("Cosmetic not found", { status: 404 });
       }
 
-      return data;
+      // determine folder names based on cosmetic type
+      const typeName = data.cosmetic_types?.name?.toLowerCase() || "unknown";
+      const iconFolder = typeName.includes("props")
+        ? "props_icons"
+        : `${typeName}_icons`;
+      const viewFolder = typeName.includes("props")
+        ? "props_view"
+        : `${typeName}_view`;
+
+      // generate public URL for the main icon
+      const iconPublicUrl = supabase.storage
+        .from("cosmetic_images")
+        .getPublicUrl(`${iconFolder}/${data.icon}`).data.publicUrl;
+
+      // generate public URLs for each cosmetic image
+      const cosmeticImagesWithUrls = data.cosmetic_images.map((image) => ({
+        ...image,
+        public_url: supabase.storage
+          .from("cosmetic_images")
+          .getPublicUrl(`${viewFolder}/${image.image_url}`).data.publicUrl,
+      }));
+
+      return {
+        ...data,
+        icon: iconPublicUrl,
+        cosmetic_images: cosmeticImagesWithUrls,
+      };
     },
   },
-
   {
     path: "/blog",
     element: <Community />,

@@ -1,12 +1,12 @@
-import NavBar from "../Components/NavBar";
+import NavBar from "../../Components/NavBar";
 import styled from "styled-components";
-import Closet from "../Components/Closet";
+import Closet from "../../Components/Closet";
 import { useLoaderData, useSearchParams, useNavigate } from "react-router-dom";
-import CosmeticIcon from "../Components/CosmeticIcon";
+import CosmeticIcon from "../../Components/CosmeticIcon";
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "../supabase/supabaseClient";
-import Footer from "../Components/Footer";
-import SubCategoryButton from "../Components/SubCategoryButton";
+import { supabase } from "../../supabase/supabaseClient";
+import Footer from "../../Components/Footer";
+import SubCategoryButton from "../../Components/SubCategoryButton";
 import "../Styles/components/loader.css";
 
 const ClosetContainer = styled.div`
