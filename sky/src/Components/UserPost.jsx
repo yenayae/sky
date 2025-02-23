@@ -9,8 +9,9 @@ import useLike from "../Hooks/useLike";
 export default function UserPost({ postInfo, postWidth }) {
   const imageLink =
     postInfo.posts_images.length > 0
-      ? `https://epybsqrrtinvvbvqjnyt.supabase.co/${postInfo.posts_images[0].image_url}`
+      ? postInfo.posts_images[0].public_url
       : null;
+
   const title = postInfo.title;
   const caption = postInfo.body || "";
   const [isLiked, handleLikeToggle] = useLike(postInfo.id);
@@ -27,7 +28,13 @@ export default function UserPost({ postInfo, postWidth }) {
       {/* render either image post or text post */}
       {imageLink ? (
         <div className="post">
-          <Link to={`/blog/${postInfo.id}`} style={{ textDecoration: "none" }}>
+          <Link
+            to={`/blog/${postInfo.id}`}
+            style={{ textDecoration: "none" }}
+            onClick={() => {
+              window.location.href = `/blog/${postInfo.id}`;
+            }}
+          >
             <img
               className="post-image"
               src={imageLink}
@@ -42,6 +49,9 @@ export default function UserPost({ postInfo, postWidth }) {
             <Link
               to={`/blog/${postInfo.id}`}
               style={{ textDecoration: "none" }}
+              onClick={() => {
+                window.location.href = `/blog/${postInfo.id}`;
+              }}
             >
               <span className="post-title">{title}</span>
             </Link>

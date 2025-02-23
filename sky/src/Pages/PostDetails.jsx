@@ -18,6 +18,7 @@ import { DisplayPosts } from "../Components/DisplayPosts";
 import { supabase } from "../supabase/supabaseClient";
 import useLike from "../Hooks/useLike";
 import { useAuth } from "../Hooks/authContext";
+import useProcessPostImages from "../Hooks/useProcessPostImages";
 
 import "../Styles/page_css/postDetails.css";
 
@@ -28,8 +29,12 @@ const PostDetails = () => {
     document.title = "Post Details";
   }, []);
 
-  const postDetails = useLoaderData();
+  const postData = useLoaderData();
+  const postDetails = postData.postDetails;
   const navigate = useNavigate();
+  const processPostImages = useProcessPostImages();
+
+  console.log(postData.cosmeticPosts);
 
   if (!user) {
     navigate("/login");
@@ -38,7 +43,7 @@ const PostDetails = () => {
   //post details metadata
   const postID = postDetails.id;
   const imagesArray = postDetails.posts_images.map((image) => {
-    return `https://epybsqrrtinvvbvqjnyt.supabase.co/${image.image_url}`;
+    return image.public_url;
   });
   const title = postDetails.title;
   const body = postDetails.body;
@@ -70,7 +75,7 @@ const PostDetails = () => {
     setIsLikedUI(isLiked);
   }, [isLiked]);
 
-  const [cosmeticPosts, setCosmeticPosts] = useState([]);
+  const [cosmeticPosts, setCosmeticPosts] = useState(postData.cosmeticPosts);
   const [fetchingPosts, setFetchingPosts] = useState(true);
 
   //fetch explore page posts (similarly tagged posts)
@@ -78,34 +83,39 @@ const PostDetails = () => {
     .map((tag) => tag.cosmetic_id)
     .flat();
 
-  useEffect(() => {
-    const fetchCosmeticPosts = async () => {
-      setFetchingPosts(true);
-      const { data, error } = await supabase
-        .from("posts_cosmetic_tags")
-        .select(
-          `
-            *,
-            posts(*, posts_images(image_url))
-          `
-        )
-        .in("cosmetic_id", cosmeticTagsIDs);
-      if (error) {
-        throw new Error("Error fetching posts: " + error.message);
-      }
+  // useEffect(() => {
+  //   const fetchCosmeticPosts = async () => {
+  //     setFetchingPosts(true);
+  //     const { data, error } = await supabase
+  //       .from("posts_cosmetic_tags")
+  //       .select(
+  //         `
+  //           *,
+  //           posts(*, posts_images(image_url))
+  //         `
+  //       )
+  //       .in("cosmetic_id", cosmeticTagsIDs);
+  //     if (error) {
+  //       throw new Error("Error fetching posts: " + error.message);
+  //     }
 
-      const posts = data
-        .map((entry) => entry.posts)
-        .flat()
-        .filter((post) => post.id !== postDetails.id);
+  //     console.log("pre filter", data);
+  //     console.log(postDetails.id);
 
-      console.log(posts);
-      setCosmeticPosts(posts);
-      setFetchingPosts(false);
-    };
+  //     let posts = data
+  //       .map((entry) => entry.posts)
+  //       .flat()
+  //       .filter((post) => post.id !== postDetails.id);
 
-    fetchCosmeticPosts();
-  }, []);
+  //     posts = processPostImages(posts);
+  //     console.log(posts);
+
+  //     setCosmeticPosts(posts);
+  //     setFetchingPosts(false);
+  //   };
+
+  //   fetchCosmeticPosts();
+  // }, []);
 
   //report
   const [showReportForm, setShowReportForm] = useState(false);
@@ -153,7 +163,7 @@ const PostDetails = () => {
     try {
       const downloadPromises = postDetails.posts_images.map(
         async (image, index) => {
-          const imageUrl = `https://epybsqrrtinvvbvqjnyt.supabase.co/${image.image_url}`;
+          const imageUrl = image.public_url;
           const response = await fetch(imageUrl);
           if (!response.ok) {
             throw new Error(`Failed to fetch image: ${imageUrl}`);

@@ -21,23 +21,27 @@ import LikedPosts from "./Pages/LikedPosts";
 import OutfitShrine from "./Pages/OutfitShrine";
 
 import { AuthProvider } from "./Hooks/authContext";
+import useProcessPostImages from "./Hooks/useProcessPostImages";
 
-const cosmeticsLoader = async () => {
-  const { data, error } = await supabase
-    .from("cosmetics")
-    .select(
-      `
-      *,
-      cosmetic_types(*)
-    `
-    )
-    .limit(150);
+const processPostImages = (posts) => {
+  return posts.map((post) => {
+    if (post.posts_images.length > 0) {
+      post.posts_images = post.posts_images.map((image) => {
+        const cleanPath = image.image_url.replace(
+          /^\/storage\/v1\/object\/public\/posts_images\//,
+          ""
+        );
 
-  if (error) {
-    throw new Error("Error fetching cosmetics: " + error.message);
-  }
-
-  return data;
+        return {
+          ...image,
+          public_url: supabase.storage
+            .from("posts_images")
+            .getPublicUrl(cleanPath).data.publicUrl,
+        };
+      });
+    }
+    return post;
+  });
 };
 
 const router = createBrowserRouter([
@@ -82,6 +86,10 @@ const router = createBrowserRouter([
         throw new Response("Cosmetic not found", { status: 404 });
       }
 
+      if (data.posts_images.length > 0) {
+        data.posts_images = processPostImages([data])[0].posts_images;
+      }
+
       return data;
     },
   },
@@ -109,6 +117,10 @@ const router = createBrowserRouter([
 
       if (error) {
         throw new Response("User not found", { status: 404 });
+      }
+
+      if (data.posts.length > 0) {
+        data.posts = processPostImages(data.posts);
       }
 
       return data;
@@ -163,7 +175,7 @@ const router = createBrowserRouter([
         throw new Response("Cosmetic not found", { status: 404 });
       }
 
-      return data;
+      return processPostImages(data);
     },
   },
 
@@ -174,7 +186,13 @@ const router = createBrowserRouter([
       const { data, error } = await supabase
         .from("posts")
         .select(
-          "*, posts_images(image_url), users(username), posts_comments(*, users(username, pfp)), posts_cosmetic_tags(*)"
+          `
+            *, 
+            posts_images(image_url), 
+            users(username), 
+            posts_comments(*, users(username, pfp)), 
+            posts_cosmetic_tags(*)
+          `
         )
         .eq("id", params.id)
         .single();
@@ -183,7 +201,41 @@ const router = createBrowserRouter([
         throw new Response("post not found", { status: 404 });
       }
 
-      return data;
+      // Process images
+      if (data.posts_images?.length > 0) {
+        data.posts_images = processPostImages([data])[0].posts_images;
+      }
+
+      // Fetch related cosmetic posts
+      const { data: cosmeticData, error: cosmeticError } = await supabase
+        .from("posts_cosmetic_tags")
+        .select(
+          `
+            *, 
+            posts(*, posts_images(image_url))
+          `
+        )
+        .in(
+          "cosmetic_id",
+          data.posts_cosmetic_tags.map((tag) => tag.cosmetic_id)
+        );
+
+      if (cosmeticError) {
+        throw new Error(
+          "Error fetching cosmetic posts: " + cosmeticError.message
+        );
+      }
+
+      // Filter out the current post
+      let posts = cosmeticData
+        .map((entry) => entry.posts)
+        .flat()
+        .filter((post) => post.id !== data.id);
+
+      posts = processPostImages(posts);
+
+      // Return the data along with the cosmetic posts
+      return { postDetails: data, cosmeticPosts: posts };
     },
   },
 ]);

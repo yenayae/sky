@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
 
 import { supabase } from "../supabase/supabaseClient";
+import useProcessPostImages from "../Hooks/useProcessPostImages";
 
 import Logout from "../Components/LogOut";
 import NavBar from "../Components/NavBar";
@@ -19,8 +20,10 @@ export default function UserProfile() {
 
   const { user } = useAuth();
   const navigate = useNavigate();
+  const processPostImages = useProcessPostImages();
 
   const [contentTabSelected, setContentTabSelected] = useState("posts");
+  const [userPosts, setUserPosts] = useState(userInfo.posts);
   const [likedPosts, setLikedPosts] = useState([]);
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
 
@@ -56,9 +59,8 @@ export default function UserProfile() {
       console.error("Error fetching lked posts:", error);
     } else {
       // setLikedPosts(data.posts);
-      console.log(data.liked_posts);
-      const likedPosts = data.liked_posts.map((post) => post.posts);
-      console.log(likedPosts);
+      let likedPosts = data.liked_posts.map((post) => post.posts);
+      likedPosts = processPostImages(likedPosts);
       setLikedPosts(likedPosts);
     }
   };
@@ -72,7 +74,9 @@ export default function UserProfile() {
     if (error) {
       console.error("Error fetching user posts:", error);
     } else {
-      console.log(data);
+      let userPosts = data.flatMap((user) => user.posts);
+      userPosts = processPostImages(userPosts);
+      setUserPosts(userPosts);
     }
   };
 
@@ -168,7 +172,7 @@ export default function UserProfile() {
           <div className="profile-content">
             {contentTabSelected === "posts" && (
               <div>
-                <DisplayPosts posts={userInfo.posts} />
+                <DisplayPosts posts={userPosts} />
               </div>
             )}
             {contentTabSelected === "likes" && (

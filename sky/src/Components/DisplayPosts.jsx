@@ -21,6 +21,8 @@ const Column = styled.div`
 `;
 
 export const DisplayPosts = ({ posts, loading = false }) => {
+  console.log("in display posts", posts);
+
   // Constants for resize function
   const RESIZE_TIMEOUT = 200;
   const COLUMN_DIVISION = 320;
