@@ -18,6 +18,7 @@ import EditPost from "./Pages/EditPost";
 import LikedPosts from "./Pages/LikedPosts";
 
 import OutfitShrine from "./Pages/OutfitShrine";
+import ProtectedRoute from "./Route/ProtectedRoute";
 
 import { AuthProvider } from "./Hooks/authContext";
 import useProcessPostImages from "./Hooks/useProcessPostImages";
@@ -49,66 +50,6 @@ const router = createBrowserRouter([
     element: <Home />,
   },
 
-  // {
-  //   path: "/app",
-  //   element: <App />,
-  // },
-
-  // {
-  //   path: "/contact",
-  //   element: <ContactPage />,
-  // },
-
-  // {
-  //   path: "/success",
-  //   element: <SubmissionPage />,
-  // },
-
-  {
-    path: "/createPost",
-    element: <CreatePost />,
-  },
-
-  {
-    path: "/editPost/:id",
-    element: <EditPost />,
-    loader: async ({ params }) => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select(
-          "*, posts_images(image_url), users(username), posts_cosmetic_tags(cosmetics(*, cosmetic_types(name)))"
-        )
-        .eq("id", params.id)
-        .single();
-
-      if (error) {
-        throw new Response("Cosmetic not found", { status: 404 });
-      }
-
-      // Process post images
-      if (data.posts_images.length > 0) {
-        data.posts_images = processPostImages([data])[0].posts_images;
-      }
-
-      // Process cosmetic tags with proper folder structure
-      data.posts_cosmetic_tags = data.posts_cosmetic_tags.map((tag) => {
-        if (tag.cosmetics?.icon) {
-          const typeName =
-            tag.cosmetics.cosmetic_types?.name?.toLowerCase() || "unknown";
-          const folder = typeName.includes("props")
-            ? "props_icons"
-            : `${typeName}_icons`;
-
-          tag.cosmetics.icon = supabase.storage
-            .from("cosmetic_images")
-            .getPublicUrl(`${folder}/${tag.cosmetics.icon}`).data.publicUrl;
-        }
-        return tag;
-      });
-
-      return data;
-    },
-  },
   {
     path: "/login",
     element: <Login />,
@@ -120,32 +61,10 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/profile/:username",
-    element: <UserProfile />,
-    loader: async ({ params }) => {
-      const { data, error } = await supabase
-        .from("users")
-        .select("*, posts(*, posts_images(image_url))")
-        .eq("username", params.username)
-        .order("created_at", { referencedTable: "posts", ascending: false })
-        .single();
-
-      if (error) {
-        throw new Response("User not found", { status: 404 });
-      }
-
-      if (data.posts.length > 0) {
-        data.posts = processPostImages(data.posts);
-      }
-
-      return data;
-    },
-  },
-
-  {
     path: "/passwordReset",
     element: <Signup />,
   },
+
   {
     path: "/cosmetics",
     element: <OutfitShrine />,
@@ -220,63 +139,137 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/blog/:id",
-    element: <PostDetails />,
-    loader: async ({ params }) => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select(
-          `
-            *, 
-            posts_images(image_url), 
-            users(username), 
-            posts_comments(*, users(username, pfp)), 
-            posts_cosmetic_tags(*)
-          `
-        )
-        .eq("id", params.id)
-        .single();
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "/createPost",
+        element: <CreatePost />,
+      },
 
-      if (error) {
-        throw new Response("post not found", { status: 404 });
-      }
+      {
+        path: "/editPost/:id",
+        element: <EditPost />,
+        loader: async ({ params }) => {
+          const { data, error } = await supabase
+            .from("posts")
+            .select(
+              "*, posts_images(image_url), users(username), posts_cosmetic_tags(cosmetics(*, cosmetic_types(name)))"
+            )
+            .eq("id", params.id)
+            .single();
 
-      // Process images
-      if (data.posts_images?.length > 0) {
-        data.posts_images = processPostImages([data])[0].posts_images;
-      }
+          if (error) {
+            throw new Response("Cosmetic not found", { status: 404 });
+          }
 
-      // Fetch related cosmetic posts
-      const { data: cosmeticData, error: cosmeticError } = await supabase
-        .from("posts_cosmetic_tags")
-        .select(
-          `
-            *, 
-            posts(*, posts_images(image_url))
-          `
-        )
-        .in(
-          "cosmetic_id",
-          data.posts_cosmetic_tags.map((tag) => tag.cosmetic_id)
-        );
+          // Process post images
+          if (data.posts_images.length > 0) {
+            data.posts_images = processPostImages([data])[0].posts_images;
+          }
 
-      if (cosmeticError) {
-        throw new Error(
-          "Error fetching cosmetic posts: " + cosmeticError.message
-        );
-      }
+          // Process cosmetic tags with proper folder structure
+          data.posts_cosmetic_tags = data.posts_cosmetic_tags.map((tag) => {
+            if (tag.cosmetics?.icon) {
+              const typeName =
+                tag.cosmetics.cosmetic_types?.name?.toLowerCase() || "unknown";
+              const folder = typeName.includes("props")
+                ? "props_icons"
+                : `${typeName}_icons`;
 
-      // Filter out the current post
-      let posts = cosmeticData
-        .map((entry) => entry.posts)
-        .flat()
-        .filter((post) => post.id !== data.id);
+              tag.cosmetics.icon = supabase.storage
+                .from("cosmetic_images")
+                .getPublicUrl(`${folder}/${tag.cosmetics.icon}`).data.publicUrl;
+            }
+            return tag;
+          });
 
-      posts = processPostImages(posts);
+          return data;
+        },
+      },
 
-      // Return the data along with the cosmetic posts
-      return { postDetails: data, cosmeticPosts: posts };
-    },
+      {
+        path: "/profile/:username",
+        element: <UserProfile />,
+        loader: async ({ params }) => {
+          const { data, error } = await supabase
+            .from("users")
+            .select("*, posts(*, posts_images(image_url))")
+            .eq("username", params.username)
+            .order("created_at", { referencedTable: "posts", ascending: false })
+            .single();
+
+          if (error) {
+            throw new Response("User not found", { status: 404 });
+          }
+
+          if (data.posts.length > 0) {
+            data.posts = processPostImages(data.posts);
+          }
+
+          return data;
+        },
+      },
+
+      {
+        path: "/blog/:id",
+        element: <PostDetails />,
+        loader: async ({ params }) => {
+          const { data, error } = await supabase
+            .from("posts")
+            .select(
+              `
+                *, 
+                posts_images(image_url), 
+                users(username), 
+                posts_comments(*, users(username, pfp)), 
+                posts_cosmetic_tags(*)
+              `
+            )
+            .eq("id", params.id)
+            .single();
+
+          if (error) {
+            throw new Response("post not found", { status: 404 });
+          }
+
+          // Process images
+          if (data.posts_images?.length > 0) {
+            data.posts_images = processPostImages([data])[0].posts_images;
+          }
+
+          // Fetch related cosmetic posts
+          const { data: cosmeticData, error: cosmeticError } = await supabase
+            .from("posts_cosmetic_tags")
+            .select(
+              `
+                *, 
+                posts(*, posts_images(image_url))
+              `
+            )
+            .in(
+              "cosmetic_id",
+              data.posts_cosmetic_tags.map((tag) => tag.cosmetic_id)
+            );
+
+          if (cosmeticError) {
+            throw new Error(
+              "Error fetching cosmetic posts: " + cosmeticError.message
+            );
+          }
+
+          // Filter out the current post
+          let posts = cosmeticData
+            .map((entry) => entry.posts)
+            .flat()
+            .filter((post) => post.id !== data.id);
+
+          posts = processPostImages(posts);
+
+          // Return the data along with the cosmetic posts
+          return { postDetails: data, cosmeticPosts: posts };
+        },
+      },
+    ],
   },
 ]);
 

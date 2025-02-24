@@ -25,6 +25,15 @@ export default function CreatePost() {
   }, []);
 
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user === undefined) {
+      navigate("/login");
+      return;
+    }
+    if (!user) navigate("/login");
+  }, [user, navigate]);
 
   const TITLE_CHARACTER_LIMIT = 50;
 
@@ -39,7 +48,6 @@ export default function CreatePost() {
   const [imageError, setImageError] = useState("");
   const [cosmeticTagError, setCosmeticTagError] = useState("");
 
-  const navigate = useNavigate();
   const sanitizeInput = (input) => DOMPurify.sanitize(input);
   const imageInputRef = useRef(null);
   const [showTagSearch, setShowTagSearch] = useState(false);

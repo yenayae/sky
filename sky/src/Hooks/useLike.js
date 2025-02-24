@@ -4,12 +4,18 @@ import { useAuth } from "./authContext";
 
 const useLike = (postID) => {
   const { user } = useAuth();
+
   const currentUserID = user?.id;
 
   const [isLiked, setIsLiked] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
+    if (!user) {
+      setIsLiked(false);
+      return;
+    }
+
     const checkIfLiked = async () => {
       const { data, error } = await supabase
         .from("liked_posts")
