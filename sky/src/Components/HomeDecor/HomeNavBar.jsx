@@ -1,10 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faHouse,
-  faCompass,
-  faUser,
-  faCircleNodes,
-} from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faCompass, faUser } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
