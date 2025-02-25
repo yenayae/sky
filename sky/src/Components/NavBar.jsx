@@ -74,8 +74,6 @@ export default function NavBar({ page, cosmeticPageReset, onSearch }) {
     onSearch(query);
   };
 
-  const CURRENT_USER = "0";
-
   return (
     <div style={{ padding: "10px" }}>
       <div

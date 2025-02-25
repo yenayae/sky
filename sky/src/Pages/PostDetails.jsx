@@ -36,10 +36,6 @@ const PostDetails = () => {
 
   console.log(postData.cosmeticPosts);
 
-  if (!user) {
-    navigate("/login");
-  }
-
   //post details metadata
   const postID = postDetails.id;
   const imagesArray = postDetails.posts_images.map((image) => {

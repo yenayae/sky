@@ -5,79 +5,85 @@ import { useState } from "react";
 
 import { useAuth } from "../Hooks/authContext";
 
+import HomeButton from "../Components/HomeDecor/HomeButton";
+import DecorPost from "../Components/HomeDecor/DecorPost";
+import HomeNavBar from "../Components/HomeDecor/HomeNavBar";
+
 import "../Styles/contactButton.css";
-
-const Content = styled.div`
-  // background-color: pink;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  padding-top: 10%;
-`;
-
-const Gif = styled.img`
-  width: 100px;
-  height: 100px;
-`;
-
-const Container = styled.div`
-  background-color: white;
-  width: 30%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const Paragraph = styled.p`
-  text-align: center;
-  color: grey;
-`;
-
-const Divider = styled.hr`
-  width: 100%;
-`;
+import "../Styles/styles.css";
+import "../Styles/page_css/home.css";
 
 const Home = () => {
   const { user } = useAuth();
 
   return (
     <div>
-      <NavBar></NavBar>
+      <HomeNavBar />
+      <div className="content">
+        <div className="home-banner">
+          <div className="banner-content">
+            <div className="logo-wrapper">
+              <img
+                className="sky-logo"
+                src="/img/assets/home/sky_logo.png"
+                alt="sky logo"
+              />
+              <span className="closet-span">sky closet</span>
+            </div>
+            <div className="home-button">
+              <HomeButton
+                toLink="/cosmetics"
+                textContent={"to outfit shrine"}
+              />
+            </div>
+          </div>
+        </div>
 
-      <Content>
-        <Container>
-          <Gif
-            src="img/assets/cry.gif
-          "
-            alt="crying gif"
-          />
+        <div className="home-body card1">
+          <div className="left-card">
+            <div className="decor-posts">
+              <div className="decor-post1">
+                <DecorPost
+                  image="/img/assets/home/color_post.jpg"
+                  width={240}
+                />
+              </div>
+              <div className="decor-post2">
+                <DecorPost
+                  image="/img/assets/home/dance_post.jpg"
+                  width={300}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="right-card">
+            <div className="home-card">
+              <h2>explore other sky kids outfits</h2>
+              <div className="card1-button">
+                <HomeButton toLink="/blog" textContent="explore posts" />
+              </div>
+            </div>
+          </div>
+        </div>
 
-          <Paragraph>
-            hi there! i'm struggling alot with figuring out the ui for this
-            page.... please leave behind any suggestions below! i'm open to any
-            criticism, for all parts of this website!!!
-          </Paragraph>
-
-          <Divider />
-
-          <Paragraph>
-            this website is a work in progress. it's a letterboxed version for
-            game{" "}
-            <a className="sky-link" href="https://www.thatskygame.com/">
-              sky:children of the light
-            </a>{" "}
-            from thatgamecompany! cosmetics are a huge part of this game,
-            however there isn't a good catalog of them online besides the wiki
-            (which tends to get laggy and slow). this website is for players to
-            research about cosmetics they'd like, ask other players to do outfit
-            requests, or simply look for inspiration!
-          </Paragraph>
-
-          <Link to="/contact">
-            <button className="contact-button">contact me!!!</button>
-          </Link>
-        </Container>
-      </Content>
+        <div className="home-body card2">
+          <div className="left-card">
+            <div className="home-card">
+              <h2>share your own outfits!</h2>
+              <div className="card1-button">
+                <HomeButton toLink="/login" textContent="join the community" />
+              </div>
+            </div>
+          </div>
+          <div className="right-card">
+            <img
+              className="card2-image"
+              src="/img/assets/home/pin.webp"
+              alt=""
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
